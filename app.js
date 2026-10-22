@@ -4,9 +4,8 @@
  Never use a service_role key or Daraja secrets here.
 */
 (() => {
-  const SUPABASE_URL = "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
-  const SUPABASE_PUBLISHABLE_KEY = "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE";
-
+  const SUPABASE_URL = "https://osumagzwxvyaepvcksin.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
   const message = document.getElementById("authMessage");
   const say = (text) => {
     if (message) message.textContent = text;
