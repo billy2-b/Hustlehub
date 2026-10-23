@@ -12,7 +12,7 @@
 <body>
   <header>
     <h2>HUSTLEHUB 🇰🇪</h2>
-    <p>Kenyan Jobs & Opportunities</p>
+    <p>Kenyan Jobs &amp; Opportunities</p>
   </header>
 
   <main>
@@ -24,22 +24,13 @@
 
     <section id="jobs">
       <h2>Available Opportunities</h2>
-      <p>These are sample listings for demonstration only, not verified vacancies.</p>
+      <p>Explore job opportunities from our database.</p>
 
-      <article class="job-card">
-        <h3>Customer Support Assistant</h3>
-        <p>Sample employer · Nairobi</p>
-      </article>
+      <div id="jobsMessage" role="status">
+        Loading available jobs...
+      </div>
 
-      <article class="job-card">
-        <h3>Office Administration Intern</h3>
-        <p>Sample organisation · Kenya</p>
-      </article>
-
-      <article class="job-card">
-        <h3>Digital Marketing Assistant</h3>
-        <p>Sample business · Remote</p>
-      </article>
+      <div id="jobsList"></div>
     </section>
 
     <section>
@@ -48,12 +39,16 @@
         <label>Full name
           <input id="signupName" type="text" required>
         </label>
+
         <label>Email
           <input id="signupEmail" type="email" required>
         </label>
+
         <label>Password (at least 8 characters)
-          <input id="signupPassword" type="password" minlength="8" required>
+          <input id="signupPassword" type="password"
+                 minlength="8" required>
         </label>
+
         <button type="submit">Register</button>
       </form>
 
@@ -62,9 +57,11 @@
         <label>Email
           <input id="loginEmail" type="email" required>
         </label>
+
         <label>Password
           <input id="loginPassword" type="password" required>
         </label>
+
         <button type="submit">Log In</button>
       </form>
 
@@ -76,5 +73,4 @@
     <p>HUSTLEHUB · Connecting Kenyans to opportunities</p>
   </footer>
 </body>
-  </html>
-  
+</html>
