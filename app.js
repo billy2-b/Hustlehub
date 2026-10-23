@@ -1,85 +1,125 @@
 
 /*
  * HUSTLEHUB
- * Registration and login using Supabase Auth
+ * Supabase registration and login
  */
 
 (() => {
   "use strict";
 
-  // HUSTLEHUB Supabase project URL
+  // Use your exact Supabase Project URL.
+  // Do not include /rest/v1/ or /auth/v1/.
   const SUPABASE_URL =
     "https://osumagzwxvyaepycksin.supabase.co";
 
-  // Replace this placeholder with your Supabase Publishable key.
-  // Never use a Secret or service_role key in browser code.
+  // Paste your Supabase PUBLISHABLE key below.
+  // Never use a secret or service_role key here.
   const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_YdkCAt_7EHlSOB7MDgZ0Rg_EJ89I0NJ";
 
   const message = document.getElementById("authMessage");
 
-  function say(text, isError = false) {
+  function showMessage(text, isError = false) {
     if (message) {
       message.textContent = text;
       message.style.color = isError ? "#b42318" : "#176b37";
+    } else {
+      alert(text);
     }
   }
 
-  // Check configuration
-  if (SUPABASE_PUBLISHABLE_KEY.includes("PASTE_YOUR_")) {
-    say("Setup incomplete: add your Supabase Publishable key.", true);
+  function setButtonLoading(form, loading, text) {
+    const button = form.querySelector(
+      'button[type="submit"], button:not([type])'
+    );
+
+    if (button) {
+      if (loading) {
+        button.dataset.originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = text;
+      } else {
+        button.disabled = false;
+        button.textContent =
+          button.dataset.originalText || button.textContent;
+      }
+    }
+  }
+
+  // Check configuration before connecting.
+  if (
+    !SUPABASE_URL.startsWith("https://") ||
+    !SUPABASE_URL.endsWith(".supabase.co") ||
+    SUPABASE_PUBLISHABLE_KEY.includes("PASTE_YOUR_")
+  ) {
+    showMessage(
+      "Setup incomplete. Check your Supabase URL and Publishable key.",
+      true
+    );
     return;
   }
 
   if (!window.supabase) {
-    say("Supabase did not load. Check your internet connection.", true);
+    showMessage(
+      "Supabase could not load. Check your internet connection and refresh the page.",
+      true
+    );
     return;
   }
 
-  // Connect to Supabase
+  // Create the Supabase client.
   const client = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_PUBLISHABLE_KEY
   );
 
+  // Make the client available for future HUSTLEHUB features.
   window.hustlehubSupabase = client;
 
+  // -------------------------
   // REGISTRATION
+  // -------------------------
+
   const signupForm = document.getElementById("signupForm");
 
   if (signupForm) {
     signupForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const nameInput = document.getElementById("signupName");
-      const emailInput = document.getElementById("signupEmail");
-      const passwordInput = document.getElementById("signupPassword");
+      const fullName =
+        document.getElementById("signupName")?.value.trim();
 
-      const fullName = nameInput?.value.trim();
-      const email = emailInput?.value.trim();
-      const password = passwordInput?.value;
+      const email =
+        document.getElementById("signupEmail")?.value.trim();
+
+      const password =
+        document.getElementById("signupPassword")?.value;
 
       if (!fullName || !email || !password) {
-        say("Please complete all registration fields.", true);
+        showMessage("Please fill in all registration fields.", true);
         return;
       }
 
       if (password.length < 8) {
-        say("Your password must contain at least 8 characters.", true);
+        showMessage(
+          "Your password must contain at least 8 characters.",
+          true
+        );
         return;
       }
 
-      const button = signupForm.querySelector(
-        'button[type="submit"], button:not([type])'
+      setButtonLoading(
+        signupForm,
+        true,
+        "Creating account..."
       );
 
-      if (button) button.disabled = true;
-      say("Creating your HUSTLEHUB account...");
+      showMessage("Connecting securely to HUSTLEHUB...");
 
       try {
         const { data, error } = await client.auth.signUp({
-          email,
-          password,
+          email: email,
+          password: password,
           options: {
             data: {
               full_name: fullName
@@ -90,77 +130,107 @@
         if (error) throw error;
 
         if (data.user && !data.session) {
-          say(
-            "Registration submitted! Check your email for a confirmation link."
+          showMessage(
+            "Registration received! Check your email for a confirmation link."
+          );
+        } else if (data.user) {
+          showMessage(
+            "Your account was created successfully. You can now log in."
           );
         } else {
-          say("Account created successfully. You can now log in.");
+          showMessage(
+            "Registration submitted. Follow any instructions shown."
+          );
         }
 
         signupForm.reset();
+
       } catch (error) {
-        say(
-          error.message || "Registration failed. Please try again.",
+        console.error("HUSTLEHUB registration error:", error);
+
+        showMessage(
+          error.message ||
+          "Registration failed. Please check your connection and try again.",
           true
         );
       } finally {
-        if (button) button.disabled = false;
+        setButtonLoading(signupForm, false);
       }
     });
   }
 
+  // -------------------------
   // LOGIN
+  // -------------------------
+
   const loginForm = document.getElementById("loginForm");
 
   if (loginForm) {
     loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const email = document.getElementById("loginEmail")?.value.trim();
-      const password = document.getElementById("loginPassword")?.value;
+      const email =
+        document.getElementById("loginEmail")?.value.trim();
+
+      const password =
+        document.getElementById("loginPassword")?.value;
 
       if (!email || !password) {
-        say("Please enter your email and password.", true);
+        showMessage("Please enter your email and password.", true);
         return;
       }
 
-      const button = loginForm.querySelector(
-        'button[type="submit"], button:not([type])'
-      );
+      setButtonLoading(loginForm, true, "Logging in...");
 
-      if (button) button.disabled = true;
-      say("Logging in to HUSTLEHUB...");
+      showMessage("Signing in to HUSTLEHUB...");
 
       try {
-        const { data, error } = await client.auth.signInWithPassword({
-          email,
-          password
-        });
+        const { data, error } =
+          await client.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
 
         if (error) throw error;
 
-        say("Login successful! Welcome to HUSTLEHUB.");
-        loginForm.reset();
+        if (data.user) {
+          showMessage(
+            "Login successful! Welcome to HUSTLEHUB."
+          );
+          loginForm.reset();
+        }
+
       } catch (error) {
-        say(
-          error.message || "Login failed. Please check your details.",
+        console.error("HUSTLEHUB login error:", error);
+
+        showMessage(
+          error.message ||
+          "Login failed. Please check your details and try again.",
           true
         );
       } finally {
-        if (button) button.disabled = false;
+        setButtonLoading(loginForm, false);
       }
     });
   }
 
-  // Check whether a user is already signed in.
-  client.auth.getSession().then(({ data, error }) => {
-    if (error) {
-      say("Could not check your login session.", true);
-      return;
-    }
+  // -------------------------
+  // CHECK EXISTING SESSION
+  // -------------------------
 
-    if (data.session) {
-      say("You are signed in to HUSTLEHUB.");
-    }
-  });
+  client.auth.getSession()
+    .then(({ data, error }) => {
+      if (error) {
+        console.error("Session check error:", error);
+        return;
+      }
+
+      if (data.session) {
+        showMessage("You are signed in to HUSTLEHUB.");
+      }
+    })
+    .catch((error) => {
+      console.error("Session check failed:", error);
+    });
+
 })();
