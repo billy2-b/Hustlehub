@@ -9,7 +9,7 @@
 
   // HUSTLEHUB Supabase project URL
   const SUPABASE_URL =
-    "https://osumagzwxvyaepycksin.supabase.co/rest/v1/";
+    "https://osumagzwxvyaepycksin.supabase.co";
 
   // Replace this placeholder with your Supabase Publishable key.
   // Never use a Secret or service_role key in browser code.
