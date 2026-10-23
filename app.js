@@ -309,3 +309,152 @@
     });
 
 })();
+/* HUSTLEHUB ADMIN FEATURE */
+
+async function checkHustleHubAdmin() {
+  const message = document.getElementById("adminMessage");
+  const panel = document.getElementById("adminPanel");
+
+  if (!message || !panel) {
+    console.log("HUSTLEHUB admin panel is not added to index.html yet.");
+    return;
+  }
+
+  panel.hidden = true;
+  message.textContent = "Checking administrator access...";
+
+  try {
+    const { data: sessionData, error: sessionError } =
+      await client.auth.getSession();
+
+    if (sessionError) throw sessionError;
+
+    const user = sessionData.session?.user;
+
+    if (!user) {
+      message.textContent = "Please log in first.";
+      return;
+    }
+
+    const { data: profile, error: profileError } = await client
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError) throw profileError;
+
+    if (!profile || profile.role !== "admin") {
+      message.textContent =
+        "Access denied. Only authorized administrators can manage jobs.";
+      return;
+    }
+
+    message.textContent = "Administrator verified. You can manage jobs.";
+    panel.hidden = false;
+  } catch (error) {
+    console.error("Admin check failed:", error);
+    message.textContent =
+      "Could not verify admin access. Please refresh and try again.";
+  }
+}
+
+async function addHustleHubJob(event) {
+  event.preventDefault();
+
+  const message = document.getElementById("adminMessage");
+  const form = document.getElementById("adminJobForm");
+
+  if (!form || !message) return;
+
+  const title = document.getElementById("adminJobTitle").value.trim();
+  const company = document.getElementById("adminCompany").value.trim();
+  const county = document.getElementById("adminCounty").value.trim();
+  const workType = document.getElementById("adminWorkType").value;
+  const category = document.getElementById("adminCategory").value.trim();
+  const description =
+    document.getElementById("adminDescription").value.trim();
+  const applicationUrl =
+    document.getElementById("adminApplicationUrl").value.trim();
+  const status = document.getElementById("adminJobStatus").value;
+
+  if (!title || !company || !description) {
+    message.textContent = "Please complete the required job details.";
+    return;
+  }
+
+  if (applicationUrl) {
+    try {
+      const url = new URL(applicationUrl);
+      if (!["https:", "http:"].includes(url.protocol)) {
+        throw new Error("Invalid protocol");
+      }
+    } catch {
+      message.textContent =
+        "Enter a valid application link beginning with https:// or http://.";
+      return;
+    }
+  }
+
+  message.textContent = "Saving job...";
+
+  try {
+    const { data: sessionData, error: sessionError } =
+      await client.auth.getSession();
+
+    if (sessionError) throw sessionError;
+
+    if (!sessionData.session?.user) {
+      message.textContent = "Please log in again.";
+      return;
+    }
+
+    const { data: profile, error: profileError } = await client
+      .from("profiles")
+      .select("role")
+      .eq("id", sessionData.session.user.id)
+      .maybeSingle();
+
+    if (profileError) throw profileError;
+
+    if (profile?.role !== "admin") {
+      message.textContent = "Access denied.";
+      return;
+    }
+
+    const { error } = await client.from("jobs").insert({
+      title,
+      company_name: company,
+      county: county || "Kenya",
+      work_type: workType,
+      category: category || "General",
+      description,
+      application_url: applicationUrl || null,
+      status
+    });
+
+    if (error) throw error;
+
+    message.textContent = "Job saved successfully!";
+    form.reset();
+
+    if (typeof loadJobs === "function") {
+      await loadJobs();
+    }
+  } catch (error) {
+    console.error("Saving job failed:", error);
+    message.textContent =
+      "Could not save the job. Check the database permissions and try again.";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("adminJobForm");
+
+  if (form) {
+    form.addEventListener("submit", addHustleHubJob);
+  }
+
+  checkHustleHubAdmin();
+});
+
