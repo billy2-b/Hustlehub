@@ -1,7 +1,7 @@
 
 /*
  * HUSTLEHUB
- * Supabase authentication, published jobs and admin dashboard
+ * Authentication, published jobs and admin dashboard
  */
 
 (() => {
@@ -10,24 +10,21 @@
   const SUPABASE_URL =
     "https://osumagzwxvyaepycksin.supabase.co";
 
-  // Keep your existing Supabase PUBLISHABLE key here.
   const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_YdkCAt_7EHlSOB7MDgZ0Rg_EJ89I0NJ";
 
   const authMessage = document.getElementById("authMessage");
 
   function showAuthMessage(text, isError = false) {
-    if (authMessage) {
-      authMessage.textContent = text;
-      authMessage.style.color = isError ? "#b42318" : "#176b37";
-    }
+    if (!authMessage) return;
+    authMessage.textContent = text;
+    authMessage.style.color = isError ? "#b42318" : "#176b37";
   }
 
   function setButtonLoading(form, loading, text) {
     const button = form.querySelector(
       'button[type="submit"], button:not([type])'
     );
-
     if (!button) return;
 
     if (loading) {
@@ -45,13 +42,12 @@
 
   if (
     !window.supabase ||
-    !SUPABASE_URL.startsWith("https://") ||
+    !SUPABASE_PUBLISHABLE_KEY ||
     SUPABASE_PUBLISHABLE_KEY ===
-      "PASTE_YOUR_EXISTING_PUBLISHABLE_KEY_HERE" ||
-    !SUPABASE_PUBLISHABLE_KEY
+      "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE"
   ) {
     showAuthMessage(
-      "Setup incomplete. Check the Supabase library, URL and publishable key.",
+      "Setup incomplete. Check the Supabase library and publishable key.",
       true
     );
     return;
@@ -64,9 +60,7 @@
 
   window.hustlehubSupabase = client;
 
-  // -------------------------
   // LOAD PUBLISHED JOBS
-  // -------------------------
 
   async function loadJobs() {
     const jobsList = document.getElementById("jobsList");
@@ -90,7 +84,7 @@
 
       if (!jobs || jobs.length === 0) {
         jobsMessage.textContent =
-          "No published jobs are available yet. Please check again soon.";
+          "No published jobs are available yet.";
         return;
       }
 
@@ -145,13 +139,11 @@
     } catch (error) {
       console.error("HUSTLEHUB jobs error:", error);
       jobsMessage.textContent =
-        "We couldn't load jobs right now. Please refresh and try again.";
+        "We couldn't load jobs. Please refresh and try again.";
     }
   }
 
-  // -------------------------
   // CHECK ADMIN ACCESS
-  // -------------------------
 
   async function checkHustleHubAdmin() {
     const message = document.getElementById("adminMessage");
@@ -160,10 +152,9 @@
     if (!message || !panel) return;
 
     panel.hidden = true;
+    message.textContent = "Checking administrator access...";
 
     try {
-      message.textContent = "Checking administrator access...";
-
       const { data, error } = await client.auth.getSession();
 
       if (error) throw error;
@@ -182,16 +173,11 @@
         .eq("id", user.id)
         .maybeSingle();
 
-      if (profileError) {
-        console.error("Admin profile error:", profileError);
-        message.textContent =
-          "Profile check failed: " + profileError.message;
-        return;
-      }
+      if (profileError) throw profileError;
 
       if (!profile) {
         message.textContent =
-          "No profile found for your logged-in account.";
+          "No profile found for this account. Check your Supabase profile.";
         return;
       }
 
@@ -206,15 +192,18 @@
       panel.hidden = false;
     } catch (error) {
       console.error("HUSTLEHUB admin check failed:", error);
+
       message.textContent =
-        "Could not verify admin access: " +
-        (error.message || "Unknown error");
+        "Admin check error: " +
+        (error.message || String(error));
+
+      if (error.code) {
+        message.textContent += " (Code: " + error.code + ")";
+      }
     }
   }
 
-  // -------------------------
   // ADD A JOB
-  // -------------------------
 
   async function addHustleHubJob(event) {
     event.preventDefault();
@@ -223,6 +212,8 @@
     const form = document.getElementById("adminJobForm");
 
     if (!form || !message) return;
+
+    const button = form.querySelector('button[type="submit"]');
 
     try {
       const { data: sessionData, error: sessionError } =
@@ -292,12 +283,7 @@
         }
       }
 
-      const submitButton = form.querySelector(
-        'button[type="submit"], button:not([type])'
-      );
-
-      if (submitButton) submitButton.disabled = true;
-
+      if (button) button.disabled = true;
       message.textContent = "Saving job...";
 
       const { error } = await client.from("jobs").insert({
@@ -313,10 +299,9 @@
 
       if (error) throw error;
 
-      message.textContent =
-        status === "published"
-          ? "Job published successfully!"
-          : "Job saved as a draft successfully!";
+      message.textContent = status === "published"
+        ? "Job published successfully!"
+        : "Job saved as a draft successfully!";
 
       form.reset();
       await loadJobs();
@@ -326,19 +311,11 @@
         "Could not save job: " +
         (error.message || "Check your database permissions.");
     } finally {
-      const form = document.getElementById("adminJobForm");
-      if (form) {
-        const button = form.querySelector(
-          'button[type="submit"], button:not([type])'
-        );
-        if (button) button.disabled = false;
-      }
+      if (button) button.disabled = false;
     }
   }
 
-  // -------------------------
   // REGISTRATION
-  // -------------------------
 
   const signupForm = document.getElementById("signupForm");
 
@@ -384,13 +361,9 @@
           showAuthMessage(
             "Registration received! Check your email for a confirmation link."
           );
-        } else if (data.user) {
-          showAuthMessage(
-            "Your account was created successfully. You can now log in."
-          );
         } else {
           showAuthMessage(
-            "Registration submitted. Follow any instructions shown."
+            "Your account was created successfully. You can now log in."
           );
         }
 
@@ -407,9 +380,7 @@
     });
   }
 
-  // -------------------------
   // LOGIN
-  // -------------------------
 
   const loginForm = document.getElementById("loginForm");
 
@@ -453,9 +424,7 @@
     });
   }
 
-  // -------------------------
   // INITIALIZE WEBSITE
-  // -------------------------
 
   async function initializeHustleHub() {
     const adminForm = document.getElementById("adminJobForm");
@@ -489,11 +458,9 @@
     initializeHustleHub();
   }
 
-  // Refresh the admin panel whenever authentication changes.
   client.auth.onAuthStateChange((event) => {
     if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
       setTimeout(checkHustleHubAdmin, 0);
     }
   });
-
 })();
