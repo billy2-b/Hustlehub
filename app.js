@@ -10,8 +10,12 @@
   const SUPABASE_URL =
     "https://osumagzwxvyaepycksin.supabase.co";
 
+  // Keep your existing Supabase publishable key here.
   const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_YdkCAt_7EHlSOB7MDgZ0Rg_EJ89I0NJ";
+
+  const SITE_URL =
+    "https://billy2-b.github.io/Hustlehub/";
 
   const authMessage = document.getElementById("authMessage");
 
@@ -44,7 +48,7 @@
     !window.supabase ||
     !SUPABASE_PUBLISHABLE_KEY ||
     SUPABASE_PUBLISHABLE_KEY ===
-      "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE"
+      "PASTE_YOUR_EXISTING_SUPABASE_PUBLISHABLE_KEY_HERE"
   ) {
     showAuthMessage(
       "Setup incomplete. Check the Supabase library and publishable key.",
@@ -107,7 +111,7 @@
           `${job.work_type || "Not specified"} · ${job.category || "General"}`;
 
         const description = document.createElement("p");
-        description.textContent = job.description;
+        description.textContent = job.description || "";
 
         card.append(title, company, details, description);
 
@@ -156,7 +160,6 @@
 
     try {
       const { data, error } = await client.auth.getSession();
-
       if (error) throw error;
 
       const user = data.session?.user;
@@ -192,14 +195,9 @@
       panel.hidden = false;
     } catch (error) {
       console.error("HUSTLEHUB admin check failed:", error);
-
       message.textContent =
         "Admin check error: " +
         (error.message || String(error));
-
-      if (error.code) {
-        message.textContent += " (Code: " + error.code + ")";
-      }
     }
   }
 
@@ -272,7 +270,6 @@
       if (applicationUrl) {
         try {
           const url = new URL(applicationUrl);
-
           if (!["https:", "http:"].includes(url.protocol)) {
             throw new Error("Invalid URL protocol");
           }
@@ -315,7 +312,7 @@
     }
   }
 
-  // REGISTRATION
+  // REGISTRATION WITH CORRECT EMAIL REDIRECT
 
   const signupForm = document.getElementById("signupForm");
 
@@ -351,7 +348,8 @@
           email,
           password,
           options: {
-            data: { full_name: fullName }
+            data: { full_name: fullName },
+            emailRedirectTo: SITE_URL
           }
         });
 
