@@ -31,6 +31,84 @@
       </div>
 
       <div id="jobsList"></div>
+
+<!-- HUSTLEHUB ADMIN DASHBOARD -->
+<section id="adminSection">
+  <h2>HUSTLEHUB Admin Dashboard</h2>
+  <p>Authorized administrators can add and publish job listings here.</p>
+
+  <p id="adminMessage" role="status">
+    Checking administrator access...
+  </p>
+
+  <div id="adminPanel" hidden>
+    <form id="adminJobForm">
+      <label for="adminJobTitle">Job Title *</label>
+      <input
+        id="adminJobTitle"
+        type="text"
+        required
+        placeholder="e.g. Secondary School Teacher"
+      >
+
+      <label for="adminCompany">Company / Employer *</label>
+      <input
+        id="adminCompany"
+        type="text"
+        required
+        placeholder="e.g. Example School"
+      >
+
+      <label for="adminCounty">County</label>
+      <input
+        id="adminCounty"
+        type="text"
+        placeholder="e.g. Nairobi"
+      >
+
+      <label for="adminWorkType">Work Type</label>
+      <select id="adminWorkType">
+        <option>Full-time</option>
+        <option>Part-time</option>
+        <option>Contract</option>
+        <option>Internship</option>
+        <option>Remote</option>
+      </select>
+
+      <label for="adminCategory">Job Category</label>
+      <input
+        id="adminCategory"
+        type="text"
+        placeholder="e.g. Education"
+      >
+
+      <label for="adminDescription">Job Description *</label>
+      <textarea
+        id="adminDescription"
+        required
+        rows="5"
+        placeholder="Describe the duties and requirements."
+      ></textarea>
+
+      <label for="adminApplicationUrl">Application Link</label>
+      <input
+        id="adminApplicationUrl"
+        type="url"
+        placeholder="https://example.com/apply"
+      >
+
+      <label for="adminJobStatus">Listing Status</label>
+      <select id="adminJobStatus">
+        <option value="draft">Save as Draft</option>
+        <option value="published">Publish Job</option>
+      </select>
+
+      <button type="submit">Save Job</button>
+    </form>
+  </div>
+</section>
+<!-- END HUSTLEHUB ADMIN DASHBOARD -->
+
     </section>
 
     <section>
