@@ -26,6 +26,7 @@
   function showAuthMessage(message, isError = false) {
     const element = $("authMessage");
     if (!element) return;
+
     element.textContent = message;
     element.style.color = isError ? "#b42318" : "#176b37";
   }
@@ -42,6 +43,33 @@
       button.disabled = false;
       button.textContent =
         button.dataset.originalText || button.textContent;
+    }
+  }
+
+  function money(value) {
+    return "KSh " + Number(value || 0).toLocaleString("en-KE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function clearWalletUI() {
+    if ($("walletBalance")) $("walletBalance").textContent = "KSh 0.00";
+    if ($("walletRewards")) $("walletRewards").textContent = "KSh 0.00";
+    if ($("walletPending")) $("walletPending").textContent = "KSh 0.00";
+    if ($("walletMinimum")) $("walletMinimum").textContent = "KSh 100.00";
+
+    if ($("walletMessage")) {
+      $("walletMessage").textContent = "Sign in to view your wallet.";
+    }
+
+    if ($("walletHistoryMessage")) {
+      $("walletHistoryMessage").textContent =
+        "Sign in to view your transaction history.";
+    }
+
+    if ($("walletTransactionsList")) {
+      $("walletTransactionsList").replaceChildren();
     }
   }
 
@@ -70,25 +98,12 @@
     }
   }
 
-  function clearWalletUI() {
-    if ($("walletBalance")) $("walletBalance").textContent = "KSh 0.00";
-    if ($("walletRewards")) $("walletRewards").textContent = "KSh 0.00";
-    if ($("walletPending")) $("walletPending").textContent = "KSh 0.00";
-    if ($("walletMinimum")) $("walletMinimum").textContent = "KSh 100.00";
-    if ($("walletMessage")) {
-      $("walletMessage").textContent = "Sign in to view your wallet.";
-    }
-
-    if ($("walletTransactionsList")) {
-      $("walletTransactionsList").replaceChildren();
-    }
-  }
-
   async function verifyAdmin() {
     const { data, error } = await client.auth.getUser();
     if (error) throw error;
 
     const user = data.user;
+
     if (!user || !currentUser || user.id !== currentUser.id) {
       throw new Error("Please sign in again.");
     }
@@ -100,6 +115,7 @@
       .maybeSingle();
 
     if (profileError) throw profileError;
+
     if (profile?.role !== "admin") {
       throw new Error("Administrator access required.");
     }
@@ -109,6 +125,7 @@
 
   async function checkAdmin() {
     isVerifiedAdmin = false;
+
     if ($("adminSection")) $("adminSection").hidden = true;
     if ($("adminPanel")) $("adminPanel").hidden = true;
 
@@ -119,6 +136,7 @@
       if (!currentUser) return;
 
       isVerifiedAdmin = true;
+
       if ($("adminSection")) $("adminSection").hidden = false;
       if ($("adminPanel")) $("adminPanel").hidden = false;
 
@@ -130,6 +148,7 @@
       await loadAdminJobs();
     } catch (error) {
       console.info("Admin dashboard not shown:", error.message);
+
       if ($("adminMessage")) $("adminMessage").textContent = "";
     }
   }
@@ -137,6 +156,7 @@
   async function loadJobs() {
     const list = $("jobsList");
     const message = $("jobsMessage");
+
     if (!list || !message) return;
 
     list.replaceChildren();
@@ -159,6 +179,7 @@
         .order("created_at", { ascending: false });
 
       if (error) throw error;
+
       if (!currentUser || currentUser.id !== requestedUserId) return;
 
       if (!jobs?.length) {
@@ -223,6 +244,7 @@
   async function loadAdminJobs() {
     const list = $("adminJobsList");
     const message = $("adminJobsMessage");
+
     if (!list || !message) return;
 
     list.replaceChildren();
@@ -333,12 +355,17 @@
     const pendingEl = $("walletPending");
     const minimumEl = $("walletMinimum");
     const messageEl = $("walletMessage");
+    const historyMessageEl = $("walletHistoryMessage");
+    const historyList = $("walletTransactionsList");
 
     if (!user || !client) return;
 
     const requestedUserId = user.id;
 
     if (messageEl) messageEl.textContent = "Loading wallet...";
+    if (historyMessageEl) {
+      historyMessageEl.textContent = "Loading transaction history...";
+    }
 
     try {
       const { data: wallet, error: walletError } = await client
@@ -368,20 +395,13 @@
 
       if (settingsError) throw settingsError;
 
-      // Do not display one account's data after switching accounts.
       if (!currentUser || currentUser.id !== requestedUserId) return;
 
-      const money = (value) =>
-        "KSh " + Number(value || 0).toLocaleString("en-KE", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
+      const rows = transactions || [];
 
       if (balanceEl) {
         balanceEl.textContent = money(wallet?.balance_kes);
       }
-
-      const rows = transactions || [];
 
       const rewards = rows
         .filter((row) =>
@@ -403,8 +423,12 @@
         );
       }
 
-      // Render transactions if the page contains this list element.
-      const historyList = $("walletTransactionsList");
+      // FIX: update the history message from the HTML.
+      if (historyMessageEl) {
+        historyMessageEl.textContent = rows.length
+          ? `${rows.length} transaction(s) found.`
+          : "No wallet transactions yet.";
+      }
 
       if (historyList) {
         historyList.replaceChildren();
@@ -420,7 +444,9 @@
 
             const description = document.createElement("p");
             description.textContent =
-              row.description || row.transaction_type.replaceAll("_", " ");
+              row.description ||
+              String(row.transaction_type || "Transaction")
+                .replaceAll("_", " ");
 
             const amount = document.createElement("p");
             amount.textContent =
@@ -448,6 +474,11 @@
       if (messageEl) {
         messageEl.textContent =
           "Could not load wallet information. Please refresh and try again.";
+      }
+
+      if (historyMessageEl) {
+        historyMessageEl.textContent =
+          "Could not load transaction history. Please refresh and try again.";
       }
     }
   }
@@ -666,31 +697,4 @@
 
     client.auth.onAuthStateChange((event, session) => {
       if (
-        event === "SIGNED_IN" ||
-        event === "SIGNED_OUT" ||
-        event === "TOKEN_REFRESHED" ||
-        event === "USER_UPDATED"
-      ) {
-        setTimeout(async () => {
-          const user = session?.user || null;
-
-          updateAccountUI(user);
-
-          if (user) {
-            await loadJobs();
-            await checkAdmin();
-            await loadWallet(user);
-          }
-        }, 0);
-      }
-    });
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initialize, {
-      once: true
-    });
-  } else {
-    initialize();
-  }
-})();
+        event === "SIGNED_
