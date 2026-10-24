@@ -1,7 +1,8 @@
 
 /*
  * HUSTLEHUB
- * Registration, login, member-only jobs and verified admin dashboard
+ * Registration, login, member-only jobs,
+ * verified admin dashboard and read-only wallet
  */
 
 (() => {
@@ -10,7 +11,6 @@
   const SUPABASE_URL =
     "https://osumagzwxvyaepycksin.supabase.co";
 
-  // Keep your existing Supabase publishable key here.
   const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_YdkCAt_7EHlSOB7MDgZ0Rg_EJ89I0NJ";
 
@@ -65,6 +65,22 @@
       if ($("jobsMessage")) $("jobsMessage").textContent = "";
       if ($("adminJobsList")) $("adminJobsList").replaceChildren();
       if ($("adminJobsMessage")) $("adminJobsMessage").textContent = "";
+
+      clearWalletUI();
+    }
+  }
+
+  function clearWalletUI() {
+    if ($("walletBalance")) $("walletBalance").textContent = "KSh 0.00";
+    if ($("walletRewards")) $("walletRewards").textContent = "KSh 0.00";
+    if ($("walletPending")) $("walletPending").textContent = "KSh 0.00";
+    if ($("walletMinimum")) $("walletMinimum").textContent = "KSh 100.00";
+    if ($("walletMessage")) {
+      $("walletMessage").textContent = "Sign in to view your wallet.";
+    }
+
+    if ($("walletTransactionsList")) {
+      $("walletTransactionsList").replaceChildren();
     }
   }
 
@@ -105,10 +121,12 @@
       isVerifiedAdmin = true;
       if ($("adminSection")) $("adminSection").hidden = false;
       if ($("adminPanel")) $("adminPanel").hidden = false;
+
       if ($("adminMessage")) {
         $("adminMessage").textContent =
           "Administrator verified. You can manage job listings.";
       }
+
       await loadAdminJobs();
     } catch (error) {
       console.info("Admin dashboard not shown:", error.message);
@@ -128,6 +146,7 @@
       return;
     }
 
+    const requestedUserId = currentUser.id;
     message.textContent = "Loading available jobs...";
 
     try {
@@ -140,7 +159,7 @@
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      if (!currentUser) return;
+      if (!currentUser || currentUser.id !== requestedUserId) return;
 
       if (!jobs?.length) {
         message.textContent = "No published jobs are available yet.";
@@ -178,6 +197,7 @@
         if (job.application_url) {
           try {
             const url = new URL(job.application_url);
+
             if (["https:", "http:"].includes(url.protocol)) {
               const link = document.createElement("a");
               link.href = url.href;
@@ -187,7 +207,7 @@
               card.appendChild(link);
             }
           } catch {
-            // Do not display invalid application links.
+            // Ignore invalid application links.
           }
         }
 
@@ -247,8 +267,10 @@
 
         toggle.addEventListener("click", async () => {
           toggle.disabled = true;
+
           try {
             await verifyAdmin();
+
             const nextStatus =
               job.status === "published" ? "draft" : "published";
 
@@ -258,6 +280,7 @@
               .eq("id", job.id);
 
             if (error) throw error;
+
             await loadJobs();
             await loadAdminJobs();
           } catch (error) {
@@ -275,14 +298,17 @@
           if (!confirm("Permanently delete this job listing?")) return;
 
           remove.disabled = true;
+
           try {
             await verifyAdmin();
+
             const { error } = await client
               .from("jobs")
               .delete()
               .eq("id", job.id);
 
             if (error) throw error;
+
             await loadJobs();
             await loadAdminJobs();
           } catch (error) {
@@ -301,8 +327,134 @@
     }
   }
 
+  async function loadWallet(user) {
+    const balanceEl = $("walletBalance");
+    const rewardsEl = $("walletRewards");
+    const pendingEl = $("walletPending");
+    const minimumEl = $("walletMinimum");
+    const messageEl = $("walletMessage");
+
+    if (!user || !client) return;
+
+    const requestedUserId = user.id;
+
+    if (messageEl) messageEl.textContent = "Loading wallet...";
+
+    try {
+      const { data: wallet, error: walletError } = await client
+        .from("wallets")
+        .select("balance_kes")
+        .eq("user_id", requestedUserId)
+        .maybeSingle();
+
+      if (walletError) throw walletError;
+
+      const { data: transactions, error: transactionError } = await client
+        .from("wallet_transactions")
+        .select(
+          "transaction_type,amount_kes,status,description,created_at"
+        )
+        .eq("user_id", requestedUserId)
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (transactionError) throw transactionError;
+
+      const { data: settings, error: settingsError } = await client
+        .from("wallet_settings")
+        .select("minimum_withdrawal_kes")
+        .eq("id", 1)
+        .maybeSingle();
+
+      if (settingsError) throw settingsError;
+
+      // Do not display one account's data after switching accounts.
+      if (!currentUser || currentUser.id !== requestedUserId) return;
+
+      const money = (value) =>
+        "KSh " + Number(value || 0).toLocaleString("en-KE", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+
+      if (balanceEl) {
+        balanceEl.textContent = money(wallet?.balance_kes);
+      }
+
+      const rows = transactions || [];
+
+      const rewards = rows
+        .filter((row) =>
+          row.transaction_type === "referral_reward" &&
+          row.status === "completed"
+        )
+        .reduce((sum, row) => sum + Number(row.amount_kes || 0), 0);
+
+      const pending = rows
+        .filter((row) => row.status === "pending")
+        .reduce((sum, row) => sum + Number(row.amount_kes || 0), 0);
+
+      if (rewardsEl) rewardsEl.textContent = money(rewards);
+      if (pendingEl) pendingEl.textContent = money(pending);
+
+      if (minimumEl) {
+        minimumEl.textContent = money(
+          settings?.minimum_withdrawal_kes ?? 100
+        );
+      }
+
+      // Render transactions if the page contains this list element.
+      const historyList = $("walletTransactionsList");
+
+      if (historyList) {
+        historyList.replaceChildren();
+
+        if (!rows.length) {
+          const empty = document.createElement("p");
+          empty.textContent = "No wallet transactions yet.";
+          historyList.appendChild(empty);
+        } else {
+          rows.forEach((row) => {
+            const item = document.createElement("article");
+            item.className = "transaction-item";
+
+            const description = document.createElement("p");
+            description.textContent =
+              row.description || row.transaction_type.replaceAll("_", " ");
+
+            const amount = document.createElement("p");
+            amount.textContent =
+              money(row.amount_kes) + " · " + row.status;
+
+            const date = document.createElement("p");
+            date.textContent = row.created_at
+              ? new Date(row.created_at).toLocaleString("en-KE")
+              : "";
+
+            item.append(description, amount, date);
+            historyList.appendChild(item);
+          });
+        }
+      }
+
+      if (messageEl) {
+        messageEl.textContent = wallet
+          ? "Wallet information updated."
+          : "No wallet record found. Please contact support.";
+      }
+    } catch (error) {
+      console.error("Wallet loading failed:", error);
+
+      if (messageEl) {
+        messageEl.textContent =
+          "Could not load wallet information. Please refresh and try again.";
+      }
+    }
+  }
+
   async function handleSignup(event) {
     event.preventDefault();
+
     const form = $("signupForm");
     const fullName = $("signupName")?.value.trim();
     const email = $("signupEmail")?.value.trim();
@@ -332,12 +484,14 @@
         updateAccountUI(data.session.user);
         await loadJobs();
         await checkAdmin();
+        await loadWallet(data.session.user);
         showAuthMessage("Your HUSTLEHUB account is ready.");
       } else {
         showAuthMessage(
           "Registration received! Check your email for a confirmation link."
         );
       }
+
       form.reset();
     } catch (error) {
       showAuthMessage(error.message || "Registration failed.", true);
@@ -348,6 +502,7 @@
 
   async function handleLogin(event) {
     event.preventDefault();
+
     const form = $("loginForm");
     const email = $("loginEmail")?.value.trim();
     const password = $("loginPassword")?.value;
@@ -371,6 +526,8 @@
       updateAccountUI(data.user);
       await loadJobs();
       await checkAdmin();
+      await loadWallet(data.user);
+
       showAuthMessage("Login successful! Welcome to HUSTLEHUB.");
       form.reset();
     } catch (error) {
@@ -399,11 +556,13 @@
 
   async function handleSaveJob(event) {
     event.preventDefault();
+
     const form = $("adminJobForm");
     const message = $("adminMessage");
 
     try {
       await verifyAdmin();
+
       if (!isVerifiedAdmin) {
         throw new Error("Administrator access has not been verified.");
       }
@@ -419,12 +578,14 @@
 
       if (applicationUrl) {
         const url = new URL(applicationUrl);
+
         if (!["https:", "http:"].includes(url.protocol)) {
           throw new Error("Use a valid http:// or https:// application link.");
         }
       }
 
       const status = $("adminJobStatus").value;
+
       if (!["draft", "published"].includes(status)) {
         throw new Error("Invalid listing status.");
       }
@@ -443,7 +604,10 @@
       if (error) throw error;
 
       message.textContent =
-        status === "published" ? "Job published successfully!" : "Job saved as draft.";
+        status === "published"
+          ? "Job published successfully!"
+          : "Job saved as draft.";
+
       form.reset();
       await loadJobs();
       await loadAdminJobs();
@@ -460,7 +624,7 @@
         "PASTE_YOUR_EXISTING_SUPABASE_PUBLISHABLE_KEY_HERE"
     ) {
       showAuthMessage(
-        "Supabase setup is incomplete. Add your existing publishable key in app.js.",
+        "Supabase setup is incomplete. Check app.js configuration.",
         true
       );
       return;
@@ -490,24 +654,32 @@
       if (user) {
         await loadJobs();
         await checkAdmin();
+        await loadWallet(user);
       }
     } catch (error) {
       console.error("Session check failed:", error);
-      showAuthMessage("Could not check your session. Please refresh.", true);
+      showAuthMessage(
+        "Could not check your session. Please refresh.",
+        true
+      );
     }
 
     client.auth.onAuthStateChange((event, session) => {
       if (
         event === "SIGNED_IN" ||
         event === "SIGNED_OUT" ||
-        event === "TOKEN_REFRESHED"
+        event === "TOKEN_REFRESHED" ||
+        event === "USER_UPDATED"
       ) {
         setTimeout(async () => {
-          updateAccountUI(session?.user || null);
+          const user = session?.user || null;
 
-          if (session?.user) {
+          updateAccountUI(user);
+
+          if (user) {
             await loadJobs();
             await checkAdmin();
+            await loadWallet(user);
           }
         }, 0);
       }
@@ -515,7 +687,9 @@
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initialize, { once: true });
+    document.addEventListener("DOMContentLoaded", initialize, {
+      once: true
+    });
   } else {
     initialize();
   }
