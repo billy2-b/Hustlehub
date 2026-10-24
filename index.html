@@ -3,78 +3,47 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#08794b">
   <meta name="description" content="HUSTLEHUB connects Kenyans to job opportunities.">
-
-  <title>HUSTLEHUB | Kenyan Job Opportunities</title>
+  <title>HUSTLEHUB | Connecting Kenyans to Opportunities</title>
 
   <link rel="stylesheet" href="styles.css">
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="app.js"></script>
   <script defer src="navigation.js"></script>
 </head>
 
 <body>
-
-  <!-- HEADER -->
   <header>
-    <div class="brand">
-      <h1>HUSTLEHUB</h1>
-      <p>Connecting Kenyans to opportunities</p>
-    </div>
+    <h1>HUSTLEHUB</h1>
+    <p>Connecting Kenyans to opportunities</p>
   </header>
 
   <main>
-
-    <!-- REGISTRATION AND LOGIN -->
+    <!-- SIGN UP AND LOGIN -->
     <section id="accountSection">
       <div id="authForms">
-
         <section class="hero">
-          <h2>Your next opportunity starts here.</h2>
-          <p>
-            Discover jobs, build your future, and connect with opportunities
-            across Kenya.
-          </p>
+          <h2>Your next opportunity starts here!</h2>
+          <p>Discover jobs and opportunities across Kenya.</p>
         </section>
 
         <section>
           <h2>Create an Account</h2>
-
           <form id="signupForm">
             <label for="signupName">Full name</label>
-            <input
-              id="signupName"
-              name="full_name"
-              type="text"
-              autocomplete="name"
-              placeholder="Enter your full name"
-              required
-            >
+            <input id="signupName" type="text" autocomplete="name"
+                   placeholder="Enter your full name" required>
 
             <label for="signupEmail">Email address</label>
-            <input
-              id="signupEmail"
-              name="email"
-              type="email"
-              autocomplete="email"
-              placeholder="Enter your email"
-              required
-            >
+            <input id="signupEmail" type="email" autocomplete="email"
+                   placeholder="Enter your email" required>
 
             <label for="signupPassword">Password</label>
-            <input
-              id="signupPassword"
-              name="password"
-              type="password"
-              autocomplete="new-password"
-              minlength="6"
-              placeholder="Create a password"
-              required
-            >
+            <input id="signupPassword" type="password"
+                   autocomplete="new-password" minlength="6"
+                   placeholder="Create a password" required>
 
             <button type="submit">Register</button>
           </form>
@@ -82,453 +51,265 @@
 
         <section>
           <h2>Welcome Back</h2>
-
           <form id="loginForm">
             <label for="loginEmail">Email address</label>
-            <input
-              id="loginEmail"
-              name="email"
-              type="email"
-              autocomplete="email"
-              placeholder="Enter your email"
-              required
-            >
+            <input id="loginEmail" type="email" autocomplete="email"
+                   placeholder="Enter your email" required>
 
             <label for="loginPassword">Password</label>
-            <input
-              id="loginPassword"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              placeholder="Enter your password"
-              required
-            >
+            <input id="loginPassword" type="password"
+                   autocomplete="current-password"
+                   placeholder="Enter your password" required>
 
             <button type="submit">Log In</button>
           </form>
         </section>
-
       </div>
 
       <p id="authMessage" role="status" aria-live="polite"></p>
 
-      <!-- SIGNED-IN ACCOUNT -->
       <section id="signedInPanel" hidden>
         <p id="signedInMessage"></p>
         <button id="logoutButton" type="button">Log Out</button>
       </section>
     </section>
 
-    <!-- MEMBER DASHBOARD -->
+    <!-- SIGNED-IN MEMBER AREA -->
     <div id="memberArea" hidden>
 
-      <!-- HOME -->
+      <!-- HOME PAGE -->
       <section id="homeDashboard">
-        <h2>Welcome to HUSTLEHUB</h2>
+        <h2>HELLO 👋</h2>
+        <p id="homeGreeting">Welcome to HUSTLEHUB!</p>
 
-        <p>
-          Your platform for discovering job opportunities across Kenya.
-        </p>
+        <article class="dashboard-card">
+          <h3>Your Opportunities</h3>
+          <p>Discover available jobs and application details.</p>
+          <button type="button" class="dashboard-nav-button"
+                  data-target="jobs">Explore Jobs</button>
+        </article>
 
-        <div class="home-dashboard-cards">
+        <article class="dashboard-card">
+          <h3>My Wallet</h3>
+          <p>View your wallet balance and transaction information.</p>
+          <button type="button" class="dashboard-nav-button"
+                  data-target="walletSection">Open Wallet</button>
+        </article>
 
-          <article class="dashboard-card">
-            <h3>Find Jobs</h3>
-            <p>
-              Explore available opportunities and application details.
-            </p>
-            <button
-              type="button"
-              data-target="jobs"
-              class="dashboard-nav-button"
-            >
-              Explore Jobs
-            </button>
-          </article>
-
-          <article class="dashboard-card">
-            <h3>My Wallet</h3>
-            <p>View your wallet balance and transaction information.</p>
-            <button
-              type="button"
-              data-target="walletSection"
-              class="dashboard-nav-button"
-            >
-              Open Wallet
-            </button>
-          </article>
-
-          <article class="dashboard-card">
-            <h3>Support</h3>
-            <p>Find information about using HUSTLEHUB safely.</p>
-            <button
-              type="button"
-              data-target="supportSection"
-              class="dashboard-nav-button"
-            >
-              Get Support
-            </button>
-          </article>
-
-        </div>
+        <button id="homeLogoutButton" type="button">Log Out</button>
       </section>
 
-      <!-- WALLET -->
+      <!-- WALLET PAGE -->
       <section id="walletSection" hidden>
         <h2>My Wallet</h2>
 
-        <div class="wallet-balance-card">
+        <article class="wallet-balance-card">
           <p>Available Balance</p>
           <h3 id="walletBalance">KSh 0.00</h3>
-        </div>
+        </article>
 
         <p id="walletMessage" role="status" aria-live="polite">
-          Your wallet information will appear here.
+          Wallet information will appear here.
         </p>
 
-        <div class="wallet-summary">
-          <p>
-            Referral rewards:
-            <strong id="walletRewards">KSh 0.00</strong>
-          </p>
+        <article class="dashboard-card">
+          <h3>Referral Rewards</h3>
+          <p id="walletRewards">KSh 0.00</p>
+        </article>
 
-          <p>
-            Pending transactions:
-            <strong id="walletPending">KSh 0.00</strong>
-          </p>
+        <article class="dashboard-card">
+          <h3>Pending Transactions</h3>
+          <p id="walletPending">KSh 0.00</p>
+        </article>
 
-          <p>
-            Minimum withdrawal:
-            <strong id="walletMinimum">KSh 100.00</strong>
-          </p>
-        </div>
+        <p>Minimum withdrawal: <strong id="walletMinimum">KSh 100.00</strong></p>
 
-        <!-- DEPOSIT -->
         <section>
-          <h3>Add Money</h3>
-
-          <p>
-            Deposits will only be confirmed after secure payment processing.
-          </p>
-
+          <h3>Deposit Money</h3>
           <form id="walletDepositForm">
             <label for="depositAmount">Amount (KSh)</label>
-            <input
-              id="depositAmount"
-              name="amount"
-              type="number"
-              min="1"
-              step="1"
-              placeholder="Enter amount"
-              required
-            >
+            <input id="depositAmount" type="number" min="1"
+                   step="1" placeholder="Enter amount" required>
 
             <label for="depositPhone">M-Pesa phone number</label>
-            <input
-              id="depositPhone"
-              name="phone"
-              type="tel"
-              autocomplete="tel"
-              placeholder="e.g. 07XXXXXXXX"
-              required
-            >
+            <input id="depositPhone" type="tel"
+                   placeholder="e.g. 07XXXXXXXX" required>
 
             <button type="submit">Request Deposit</button>
           </form>
-
           <p id="depositMessage" role="status" aria-live="polite"></p>
         </section>
 
-        <!-- WITHDRAWAL -->
         <section>
           <h3>Withdraw Money</h3>
-
           <form id="walletWithdrawForm">
             <label for="withdrawAmount">Amount (KSh)</label>
-            <input
-              id="withdrawAmount"
-              name="amount"
-              type="number"
-              min="1"
-              step="1"
-              placeholder="Enter amount"
-              required
-            >
+            <input id="withdrawAmount" type="number" min="1"
+                   step="1" placeholder="Enter amount" required>
 
             <label for="withdrawPhone">M-Pesa phone number</label>
-            <input
-              id="withdrawPhone"
-              name="phone"
-              type="tel"
-              autocomplete="tel"
-              placeholder="e.g. 07XXXXXXXX"
-              required
-            >
+            <input id="withdrawPhone" type="tel"
+                   placeholder="e.g. 07XXXXXXXX" required>
 
             <button type="submit">Request Withdrawal</button>
           </form>
-
           <p id="withdrawMessage" role="status" aria-live="polite"></p>
-
-          <p>
-            Withdrawal requests are subject to balance verification,
-            security checks, and approval.
-          </p>
         </section>
 
-        <!-- TRANSACTION HISTORY -->
         <section>
           <h3>Transaction History</h3>
-
-          <p id="walletHistoryMessage">
-            Your transactions will appear here when available.
-          </p>
-
+          <p id="walletHistoryMessage">No transaction history loaded yet.</p>
           <div id="walletTransactions"></div>
         </section>
       </section>
 
-      <!-- JOBS -->
+      <!-- JOBS PAGE -->
       <section id="jobs" hidden>
-        <h2>Available Opportunities</h2>
-
-        <p>
-          Explore job opportunities published on HUSTLEHUB.
-        </p>
-
+        <h2>Available Job Opportunities</h2>
+        <p>Explore published opportunities from our database.</p>
         <p id="jobsMessage" role="status" aria-live="polite">
-          Loading available jobs...
+          Loading jobs...
         </p>
-
         <div id="jobsList"></div>
       </section>
 
-      <!-- SUPPORT -->
+      <!-- SUPPORT PAGE -->
       <section id="supportSection" hidden>
         <h2>HUSTLEHUB Support</h2>
 
-        <p>
-          Need help using HUSTLEHUB? This section provides important
-          information for job seekers.
-        </p>
-
         <article class="dashboard-card">
-          <h3>Account Assistance</h3>
-          <p>
-            If you have trouble registering or logging in, check your
-            email address and follow any account verification instructions.
-          </p>
+          <h3>Account Help</h3>
+          <p>Use the email address and password you registered with.
+             Follow any email verification instructions.</p>
         </article>
 
         <article class="dashboard-card">
-          <h3>Job Applications</h3>
-          <p>
-            Review each job description and application details carefully.
-            Verify an employer before sharing personal information.
-          </p>
+          <h3>Job Application Help</h3>
+          <p>Read each job description carefully and verify employers
+             before sharing personal information.</p>
         </article>
 
         <article class="dashboard-card">
           <h3>Payment Safety</h3>
-          <p>
-            Never share your M-Pesa PIN, password, or verification codes.
-            Do not treat a payment request as proof that a job is genuine.
-          </p>
+          <p>Never share your M-Pesa PIN, password, or verification codes.
+             Only trust payments confirmed by the payment provider.</p>
         </article>
 
-        <p>
-          Official support contact details will be added when configured.
-        </p>
+        <p>Official support contact details will be added here.</p>
       </section>
 
-      <!-- ADMIN DASHBOARD -->
+      <!-- ADMIN PAGE -->
       <section id="adminSection" hidden>
         <h2>HUSTLEHUB Admin Dashboard</h2>
-
-        <p>
-          Authorized administrators can manage job listings here.
-        </p>
-
         <p id="adminMessage" role="status" aria-live="polite">
-          Verifying administrator access...
+          Checking administrator access...
         </p>
 
         <div id="adminPanel" hidden>
+          <h3>Add a Job</h3>
 
-          <section>
-            <h3>Add or Manage a Job</h3>
+          <form id="adminJobForm">
+            <label for="adminJobTitle">Job title</label>
+            <input id="adminJobTitle" type="text" required>
 
-            <form id="adminJobForm">
+            <label for="adminCompany">Company name</label>
+            <input id="adminCompany" type="text" required>
 
-              <label for="adminJobTitle">Job title</label>
-              <input
-                id="adminJobTitle"
-                name="title"
-                type="text"
-                required
-              >
+            <label for="adminCounty">County or location</label>
+            <input id="adminCounty" type="text" value="Kenya" required>
 
-              <label for="adminCompany">Company name</label>
-              <input
-                id="adminCompany"
-                name="company_name"
-                type="text"
-                required
-              >
+            <label for="adminWorkType">Work type</label>
+            <select id="adminWorkType" required>
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Internship">Internship</option>
+              <option value="Remote">Remote</option>
+            </select>
 
-              <label for="adminCounty">County or location</label>
-              <input
-                id="adminCounty"
-                name="county"
-                type="text"
-                value="Kenya"
-                required
-              >
+            <label for="adminCategory">Category</label>
+            <input id="adminCategory" type="text" value="General" required>
 
-              <label for="adminWorkType">Work type</label>
-              <select id="adminWorkType" name="work_type" required>
-                <option value="Full-time">Full-time</option>
-                <option value="Part-time">Part-time</option>
-                <option value="Contract">Contract</option>
-                <option value="Internship">Internship</option>
-                <option value="Remote">Remote</option>
-              </select>
+            <label for="adminDescription">Job description</label>
+            <textarea id="adminDescription" rows="5" required></textarea>
 
-              <label for="adminCategory">Category</label>
-              <input
-                id="adminCategory"
-                name="category"
-                type="text"
-                value="General"
-                required
-              >
+            <label for="adminApplicationUrl">Application URL</label>
+            <input id="adminApplicationUrl" type="url"
+                   placeholder="https://...">
 
-              <label for="adminDescription">Job description</label>
-              <textarea
-                id="adminDescription"
-                name="description"
-                rows="5"
-                required
-              ></textarea>
+            <label for="adminJobStatus">Status</label>
+            <select id="adminJobStatus" required>
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
 
-              <label for="adminApplicationUrl">
-                Application link (optional)
-              </label>
-              <input
-                id="adminApplicationUrl"
-                name="application_url"
-                type="url"
-                placeholder="https://..."
-              >
-
-              <label for="adminJobStatus">Publication status</label>
-              <select id="adminJobStatus" name="status" required>
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-              </select>
-
-              <button type="submit">Save Job</button>
-            </form>
-          </section>
+            <button type="submit">Save Job</button>
+          </form>
 
           <section id="adminJobsManager">
-            <h3>Manage Existing Jobs</h3>
-
-            <p
-              id="adminJobsMessage"
-              role="status"
-              aria-live="polite"
-            ></p>
-
+            <h3>Manage Jobs</h3>
+            <p id="adminJobsMessage" role="status" aria-live="polite"></p>
             <div id="adminJobsList"></div>
           </section>
 
-          <!-- WALLET SETTINGS -->
           <section id="adminWalletSettings">
             <h3>Wallet Settings</h3>
-
-            <p>
-              Wallet balances and transactions must be managed through
-              secure server-side operations.
-            </p>
-
-            <p
-              id="adminWalletMessage"
-              role="status"
-              aria-live="polite"
-            ></p>
+            <p id="adminWalletMessage" role="status" aria-live="polite"></p>
           </section>
-
         </div>
       </section>
-
     </div>
   </main>
 
   <!-- FIXED BOTTOM NAVIGATION -->
   <nav id="bottomNavigation" aria-label="Main navigation" hidden>
-
-    <button
-      type="button"
-      class="nav-item active"
-      data-target="homeDashboard"
-      aria-current="page"
-    >
+    <button type="button" class="nav-item active"
+            data-target="homeDashboard" aria-current="page">
       <span class="nav-icon" aria-hidden="true">⌂</span>
       <span>Home</span>
     </button>
 
-    <button
-      type="button"
-      class="nav-item"
-      data-target="walletSection"
-    >
+    <button type="button" class="nav-item" data-target="walletSection">
       <span class="nav-icon" aria-hidden="true">▣</span>
       <span>Wallet</span>
     </button>
 
-    <button
-      type="button"
-      class="nav-item"
-      data-target="jobs"
-    >
+    <button type="button" class="nav-item" data-target="jobs">
       <span class="nav-icon" aria-hidden="true">▤</span>
       <span>Jobs</span>
     </button>
 
-    <button
-      type="button"
-      class="nav-item"
-      data-target="supportSection"
-    >
+    <button type="button" class="nav-item" data-target="supportSection">
       <span class="nav-icon" aria-hidden="true">◎</span>
       <span>Support</span>
     </button>
-
   </nav>
 
-  <!-- FOOTER -->
   <footer>
     <p>HUSTLEHUB · Connecting Kenyans to opportunities</p>
   </footer>
 
-  <!-- DASHBOARD BUTTONS -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       document.querySelectorAll(".dashboard-nav-button").forEach(function (button) {
         button.addEventListener("click", function () {
           const target = button.dataset.target;
-          const navigationButton = document.querySelector(
+          const navButton = document.querySelector(
             '#bottomNavigation [data-target="' + target + '"]'
           );
-
-          if (navigationButton) {
-            navigationButton.click();
-          }
+          if (navButton) navButton.click();
         });
       });
+
+      const logoutButton = document.getElementById("logoutButton");
+      const homeLogoutButton = document.getElementById("homeLogoutButton");
+
+      if (homeLogoutButton && logoutButton) {
+        homeLogoutButton.addEventListener("click", function () {
+          logoutButton.click();
+        });
+      }
     });
   </script>
-
 </body>
 </html>
