@@ -4,91 +4,198 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HUSTLEHUB | Kenyan Jobs</title>
+  <meta name="theme-color" content="#075c3a">
+  <meta name="description" content="Discover Kenyan jobs and opportunities with HUSTLEHUB.">
+  <title>HUSTLEHUB | Kenyan Jobs & Opportunities</title>
+
   <link rel="stylesheet" href="styles.css">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="app.js"></script>
 </head>
+
 <body>
   <header>
     <h2>HUSTLEHUB 🇰🇪</h2>
-    <p>Kenyan Jobs &amp; Opportunities</p>
+    <p>Connecting Kenyans to opportunities</p>
   </header>
 
   <main>
-    <!-- LOGIN AND REGISTRATION: shown before login -->
+    <!-- REGISTRATION AND LOGIN -->
     <section id="accountSection">
       <div id="authForms">
         <section class="hero">
           <h1>Your next opportunity starts here!</h1>
-          <p>Discover opportunities and take the next step in your career.</p>
+          <p>
+            Discover opportunities, grow your career,
+            and connect with employers.
+          </p>
         </section>
 
-        <h2>Create an Account</h2>
-        <form id="signupForm">
-          <label for="signupName">Full name</label>
-          <input id="signupName" type="text" required>
+        <section>
+          <h2>Create an Account</h2>
+          <form id="signupForm">
+            <label for="signupName">Full name</label>
+            <input id="signupName" name="full_name"
+                   type="text" autocomplete="name" required>
 
-          <label for="signupEmail">Email</label>
-          <input id="signupEmail" type="email" required>
+            <label for="signupEmail">Email address</label>
+            <input id="signupEmail" name="email"
+                   type="email" autocomplete="email" required>
 
-          <label for="signupPassword">Password (at least 8 characters)</label>
-          <input id="signupPassword" type="password" minlength="8" required>
+            <label for="signupPassword">Password (at least 8 characters)</label>
+            <input id="signupPassword" name="password"
+                   type="password" minlength="8"
+                   autocomplete="new-password" required>
 
-          <button type="submit">Register</button>
-        </form>
+            <button type="submit">Register</button>
+          </form>
+        </section>
 
-        <h2>Log In</h2>
-        <form id="loginForm">
-          <label for="loginEmail">Email</label>
-          <input id="loginEmail" type="email" required>
+        <section>
+          <h2>Log In</h2>
+          <form id="loginForm">
+            <label for="loginEmail">Email address</label>
+            <input id="loginEmail" name="email"
+                   type="email" autocomplete="email" required>
 
-          <label for="loginPassword">Password</label>
-          <input id="loginPassword" type="password" required>
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" name="password"
+                   type="password" autocomplete="current-password" required>
 
-          <button type="submit">Log In</button>
-        </form>
+            <button type="submit">Log In</button>
+          </form>
+        </section>
       </div>
 
+      <!-- SIGNED-IN ACCOUNT PANEL -->
       <div id="signedInPanel" hidden>
         <h2>Your HUSTLEHUB Account</h2>
-        <p id="signedInMessage" role="status">You are signed in.</p>
+        <p id="signedInMessage" role="status">
+          You are signed in.
+        </p>
         <button id="logoutButton" type="button">Log Out</button>
       </div>
 
-      <p id="authMessage" role="status"></p>
+      <p id="authMessage" role="status" aria-live="polite"></p>
     </section>
 
-    <!-- LOGGED-IN USERS ONLY -->
+    <!-- MEMBER AREA: VISIBLE AFTER LOGIN -->
     <div id="memberArea" hidden>
+
+      <!-- WALLET DASHBOARD -->
+      <section id="walletSection">
+        <h2>My Wallet</h2>
+        <p>Manage your HUSTLEHUB funds and rewards.</p>
+
+        <div class="wallet-card">
+          <p>Available Balance</p>
+          <h3 id="walletBalance">KSh 0.00</h3>
+          <p id="walletMessage" role="status" aria-live="polite">
+            Wallet connection is being prepared.
+          </p>
+        </div>
+
+        <div class="wallet-summary">
+          <div>
+            <p>Total Rewards</p>
+            <strong id="walletRewards">KSh 0.00</strong>
+          </div>
+
+          <div>
+            <p>Pending Withdrawals</p>
+            <strong id="walletPending">KSh 0.00</strong>
+          </div>
+
+          <div>
+            <p>Minimum Withdrawal</p>
+            <strong id="walletMinimum">Loading...</strong>
+          </div>
+        </div>
+
+        <section>
+          <h3>Deposit through M-Pesa</h3>
+          <p>Choose an amount to initiate a deposit.</p>
+
+          <form id="walletDepositForm">
+            <label for="depositAmount">Amount (KSh)</label>
+            <input id="depositAmount" name="amount"
+                   type="number" min="1" step="1" required>
+
+            <label for="depositPhone">M-Pesa phone number</label>
+            <input id="depositPhone" name="phone"
+                   type="tel" inputmode="tel"
+                   placeholder="07XXXXXXXX" required>
+
+            <button type="submit">Deposit with M-Pesa</button>
+          </form>
+
+          <p id="depositMessage" role="status" aria-live="polite"></p>
+        </section>
+
+        <section>
+          <h3>Withdraw to M-Pesa</h3>
+          <p>Request a withdrawal of eligible funds.</p>
+
+          <form id="walletWithdrawForm">
+            <label for="withdrawAmount">Amount (KSh)</label>
+            <input id="withdrawAmount" name="amount"
+                   type="number" min="1" step="1" required>
+
+            <label for="withdrawPhone">M-Pesa phone number</label>
+            <input id="withdrawPhone" name="phone"
+                   type="tel" inputmode="tel"
+                   placeholder="07XXXXXXXX" required>
+
+            <button type="submit">Request Withdrawal</button>
+          </form>
+
+          <p id="withdrawMessage" role="status" aria-live="polite"></p>
+        </section>
+
+        <section>
+          <h3>Transaction History</h3>
+          <p id="walletHistoryMessage" role="status">
+            Transaction history will appear here when connected.
+          </p>
+          <div id="walletTransactions"></div>
+        </section>
+      </section>
+
+      <!-- AVAILABLE JOBS -->
       <section id="jobs">
         <h2>Available Opportunities</h2>
         <p>Explore job opportunities from our database.</p>
-        <div id="jobsMessage" role="status">Loading available jobs...</div>
+        <div id="jobsMessage" role="status" aria-live="polite">
+          Loading available jobs...
+        </div>
         <div id="jobsList"></div>
       </section>
 
-      <!-- ADMIN ONLY: app.js must verify the user's role -->
+      <!-- ADMIN AREA: APP.JS MUST VERIFY ADMIN ROLE -->
       <section id="adminSection" hidden>
         <h2>HUSTLEHUB Admin Dashboard</h2>
         <p>Manage and publish job listings.</p>
 
-        <p id="adminMessage" role="status">
+        <p id="adminMessage" role="status" aria-live="polite">
           Checking administrator access...
         </p>
 
         <div id="adminPanel" hidden>
           <form id="adminJobForm">
+            <h3>Add or Edit a Job</h3>
+
             <label for="adminJobTitle">Job Title *</label>
-            <input id="adminJobTitle" type="text" required
-                   placeholder="e.g. Secondary School Teacher">
+            <input id="adminJobTitle" type="text"
+                   required placeholder="e.g. Secondary School Teacher">
 
             <label for="adminCompany">Company / Employer *</label>
-            <input id="adminCompany" type="text" required
-                   placeholder="e.g. Example School">
+            <input id="adminCompany" type="text"
+                   required placeholder="e.g. Example School">
 
             <label for="adminCounty">County</label>
-            <input id="adminCounty" type="text" placeholder="e.g. Nairobi">
+            <input id="adminCounty" type="text"
+                   placeholder="e.g. Nairobi">
 
             <label for="adminWorkType">Work Type</label>
             <select id="adminWorkType">
@@ -122,9 +229,19 @@
 
           <section id="adminJobsManager">
             <h3>Manage Job Listings</h3>
-            <p>View and manage your draft and published jobs here.</p>
-            <p id="adminJobsMessage" role="status"></p>
+            <p>View and manage your draft and published jobs.</p>
+            <p id="adminJobsMessage" role="status" aria-live="polite"></p>
             <div id="adminJobsList"></div>
+          </section>
+
+          <!-- WALLET ADMIN SETTINGS: FUNCTIONALITY TO BE ADDED -->
+          <section id="adminWalletSettings">
+            <h3>Wallet Settings</h3>
+            <p>
+              The minimum withdrawal setting will be configurable
+              here after secure admin functionality is implemented.
+            </p>
+            <p id="adminWalletMessage" role="status"></p>
           </section>
         </div>
       </section>
