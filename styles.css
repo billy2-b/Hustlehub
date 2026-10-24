@@ -171,3 +171,62 @@ footer p {
     max-width: 100%;
   }
 }
+
+/* HUSTLEHUB FIXED BOTTOM NAVIGATION */
+#bottomNavigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: 10px 4px calc(10px + env(safe-area-inset-bottom));
+  background: #fffefa;
+  border-top: 1px solid #e5e0d4;
+  box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.06);
+  z-index: 1000;
+}
+
+#bottomNavigation .nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 5px 2px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #65736a;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#bottomNavigation .nav-icon {
+  font-size: 25px;
+  line-height: 1.1;
+}
+
+#bottomNavigation .nav-item.active {
+  color: #08794b;
+  font-weight: 700;
+}
+
+#bottomNavigation .nav-item:focus-visible {
+  outline: 2px solid #08794b;
+  outline-offset: 2px;
+}
+
+/* Keep page content above the fixed navigation */
+body {
+  padding-bottom: 90px;
+}
+
+/* Prevent hidden sections from appearing */
+[hidden] {
+  display: none !important;
+}
