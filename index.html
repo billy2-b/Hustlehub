@@ -3,279 +3,532 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#075c3a">
-  <meta name="description" content="Discover Kenyan jobs and opportunities with HUSTLEHUB.">
-  <title>HUSTLEHUB | Kenyan Jobs & Opportunities</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="theme-color" content="#08794b">
+  <meta name="description" content="HUSTLEHUB connects Kenyans to job opportunities.">
+
+  <title>HUSTLEHUB | Kenyan Job Opportunities</title>
 
   <link rel="stylesheet" href="styles.css">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="app.js"></script>
-<script defer src="navigation.js"></script>
+  <script defer src="navigation.js"></script>
 </head>
 
 <body>
+
+  <!-- HEADER -->
   <header>
-    <h2>HUSTLEHUB 🇰🇪</h2>
-    <p>Connecting Kenyans to opportunities</p>
+    <div class="brand">
+      <h1>HUSTLEHUB</h1>
+      <p>Connecting Kenyans to opportunities</p>
+    </div>
   </header>
 
   <main>
+
     <!-- REGISTRATION AND LOGIN -->
     <section id="accountSection">
       <div id="authForms">
+
         <section class="hero">
-          <h1>Your next opportunity starts here!</h1>
+          <h2>Your next opportunity starts here.</h2>
           <p>
-            Discover opportunities, grow your career,
-            and connect with employers.
+            Discover jobs, build your future, and connect with opportunities
+            across Kenya.
           </p>
         </section>
 
         <section>
           <h2>Create an Account</h2>
+
           <form id="signupForm">
             <label for="signupName">Full name</label>
-            <input id="signupName" name="full_name"
-                   type="text" autocomplete="name" required>
+            <input
+              id="signupName"
+              name="full_name"
+              type="text"
+              autocomplete="name"
+              placeholder="Enter your full name"
+              required
+            >
 
             <label for="signupEmail">Email address</label>
-            <input id="signupEmail" name="email"
-                   type="email" autocomplete="email" required>
+            <input
+              id="signupEmail"
+              name="email"
+              type="email"
+              autocomplete="email"
+              placeholder="Enter your email"
+              required
+            >
 
-            <label for="signupPassword">Password (at least 8 characters)</label>
-            <input id="signupPassword" name="password"
-                   type="password" minlength="8"
-                   autocomplete="new-password" required>
+            <label for="signupPassword">Password</label>
+            <input
+              id="signupPassword"
+              name="password"
+              type="password"
+              autocomplete="new-password"
+              minlength="6"
+              placeholder="Create a password"
+              required
+            >
 
             <button type="submit">Register</button>
           </form>
         </section>
 
         <section>
-          <h2>Log In</h2>
+          <h2>Welcome Back</h2>
+
           <form id="loginForm">
             <label for="loginEmail">Email address</label>
-            <input id="loginEmail" name="email"
-                   type="email" autocomplete="email" required>
+            <input
+              id="loginEmail"
+              name="email"
+              type="email"
+              autocomplete="email"
+              placeholder="Enter your email"
+              required
+            >
 
             <label for="loginPassword">Password</label>
-            <input id="loginPassword" name="password"
-                   type="password" autocomplete="current-password" required>
+            <input
+              id="loginPassword"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Enter your password"
+              required
+            >
 
             <button type="submit">Log In</button>
           </form>
         </section>
-      </div>
 
-      <!-- SIGNED-IN ACCOUNT PANEL -->
-      <div id="signedInPanel" hidden>
-        <h2>Your HUSTLEHUB Account</h2>
-        <p id="signedInMessage" role="status">
-          You are signed in.
-        </p>
-        <button id="logoutButton" type="button">Log Out</button>
       </div>
 
       <p id="authMessage" role="status" aria-live="polite"></p>
+
+      <!-- SIGNED-IN ACCOUNT -->
+      <section id="signedInPanel" hidden>
+        <p id="signedInMessage"></p>
+        <button id="logoutButton" type="button">Log Out</button>
+      </section>
     </section>
 
-    <!-- MEMBER AREA: VISIBLE AFTER LOGIN -->
+    <!-- MEMBER DASHBOARD -->
     <div id="memberArea" hidden>
 
-      <!-- WALLET DASHBOARD -->
-      <section id="walletSection">
-        <h2>My Wallet</h2>
-        <p>Manage your HUSTLEHUB funds and rewards.</p>
+      <!-- HOME -->
+      <section id="homeDashboard">
+        <h2>Welcome to HUSTLEHUB</h2>
 
-        <div class="wallet-card">
+        <p>
+          Your platform for discovering job opportunities across Kenya.
+        </p>
+
+        <div class="home-dashboard-cards">
+
+          <article class="dashboard-card">
+            <h3>Find Jobs</h3>
+            <p>
+              Explore available opportunities and application details.
+            </p>
+            <button
+              type="button"
+              data-target="jobs"
+              class="dashboard-nav-button"
+            >
+              Explore Jobs
+            </button>
+          </article>
+
+          <article class="dashboard-card">
+            <h3>My Wallet</h3>
+            <p>View your wallet balance and transaction information.</p>
+            <button
+              type="button"
+              data-target="walletSection"
+              class="dashboard-nav-button"
+            >
+              Open Wallet
+            </button>
+          </article>
+
+          <article class="dashboard-card">
+            <h3>Support</h3>
+            <p>Find information about using HUSTLEHUB safely.</p>
+            <button
+              type="button"
+              data-target="supportSection"
+              class="dashboard-nav-button"
+            >
+              Get Support
+            </button>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- WALLET -->
+      <section id="walletSection" hidden>
+        <h2>My Wallet</h2>
+
+        <div class="wallet-balance-card">
           <p>Available Balance</p>
           <h3 id="walletBalance">KSh 0.00</h3>
-          <p id="walletMessage" role="status" aria-live="polite">
-            Wallet connection is being prepared.
+        </div>
+
+        <p id="walletMessage" role="status" aria-live="polite">
+          Your wallet information will appear here.
+        </p>
+
+        <div class="wallet-summary">
+          <p>
+            Referral rewards:
+            <strong id="walletRewards">KSh 0.00</strong>
+          </p>
+
+          <p>
+            Pending transactions:
+            <strong id="walletPending">KSh 0.00</strong>
+          </p>
+
+          <p>
+            Minimum withdrawal:
+            <strong id="walletMinimum">KSh 100.00</strong>
           </p>
         </div>
 
-        <div class="wallet-summary">
-          <div>
-            <p>Total Rewards</p>
-            <strong id="walletRewards">KSh 0.00</strong>
-          </div>
-
-          <div>
-            <p>Pending Withdrawals</p>
-            <strong id="walletPending">KSh 0.00</strong>
-          </div>
-
-          <div>
-            <p>Minimum Withdrawal</p>
-            <strong id="walletMinimum">Loading...</strong>
-          </div>
-        </div>
-
+        <!-- DEPOSIT -->
         <section>
-          <h3>Deposit through M-Pesa</h3>
-          <p>Choose an amount to initiate a deposit.</p>
+          <h3>Add Money</h3>
+
+          <p>
+            Deposits will only be confirmed after secure payment processing.
+          </p>
 
           <form id="walletDepositForm">
             <label for="depositAmount">Amount (KSh)</label>
-            <input id="depositAmount" name="amount"
-                   type="number" min="1" step="1" required>
+            <input
+              id="depositAmount"
+              name="amount"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="Enter amount"
+              required
+            >
 
             <label for="depositPhone">M-Pesa phone number</label>
-            <input id="depositPhone" name="phone"
-                   type="tel" inputmode="tel"
-                   placeholder="07XXXXXXXX" required>
+            <input
+              id="depositPhone"
+              name="phone"
+              type="tel"
+              autocomplete="tel"
+              placeholder="e.g. 07XXXXXXXX"
+              required
+            >
 
-            <button type="submit">Deposit with M-Pesa</button>
+            <button type="submit">Request Deposit</button>
           </form>
 
           <p id="depositMessage" role="status" aria-live="polite"></p>
         </section>
 
+        <!-- WITHDRAWAL -->
         <section>
-          <h3>Withdraw to M-Pesa</h3>
-          <p>Request a withdrawal of eligible funds.</p>
+          <h3>Withdraw Money</h3>
 
           <form id="walletWithdrawForm">
             <label for="withdrawAmount">Amount (KSh)</label>
-            <input id="withdrawAmount" name="amount"
-                   type="number" min="1" step="1" required>
+            <input
+              id="withdrawAmount"
+              name="amount"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="Enter amount"
+              required
+            >
 
             <label for="withdrawPhone">M-Pesa phone number</label>
-            <input id="withdrawPhone" name="phone"
-                   type="tel" inputmode="tel"
-                   placeholder="07XXXXXXXX" required>
+            <input
+              id="withdrawPhone"
+              name="phone"
+              type="tel"
+              autocomplete="tel"
+              placeholder="e.g. 07XXXXXXXX"
+              required
+            >
 
             <button type="submit">Request Withdrawal</button>
           </form>
 
           <p id="withdrawMessage" role="status" aria-live="polite"></p>
+
+          <p>
+            Withdrawal requests are subject to balance verification,
+            security checks, and approval.
+          </p>
         </section>
 
+        <!-- TRANSACTION HISTORY -->
         <section>
           <h3>Transaction History</h3>
-          <p id="walletHistoryMessage" role="status">
-            Transaction history will appear here when connected.
+
+          <p id="walletHistoryMessage">
+            Your transactions will appear here when available.
           </p>
+
           <div id="walletTransactions"></div>
         </section>
       </section>
 
-      <!-- AVAILABLE JOBS -->
-      <section id="jobs">
+      <!-- JOBS -->
+      <section id="jobs" hidden>
         <h2>Available Opportunities</h2>
-        <p>Explore job opportunities from our database.</p>
-        <div id="jobsMessage" role="status" aria-live="polite">
+
+        <p>
+          Explore job opportunities published on HUSTLEHUB.
+        </p>
+
+        <p id="jobsMessage" role="status" aria-live="polite">
           Loading available jobs...
-        </div>
+        </p>
+
         <div id="jobsList"></div>
       </section>
 
-      <!-- ADMIN AREA: APP.JS MUST VERIFY ADMIN ROLE -->
+      <!-- SUPPORT -->
+      <section id="supportSection" hidden>
+        <h2>HUSTLEHUB Support</h2>
+
+        <p>
+          Need help using HUSTLEHUB? This section provides important
+          information for job seekers.
+        </p>
+
+        <article class="dashboard-card">
+          <h3>Account Assistance</h3>
+          <p>
+            If you have trouble registering or logging in, check your
+            email address and follow any account verification instructions.
+          </p>
+        </article>
+
+        <article class="dashboard-card">
+          <h3>Job Applications</h3>
+          <p>
+            Review each job description and application details carefully.
+            Verify an employer before sharing personal information.
+          </p>
+        </article>
+
+        <article class="dashboard-card">
+          <h3>Payment Safety</h3>
+          <p>
+            Never share your M-Pesa PIN, password, or verification codes.
+            Do not treat a payment request as proof that a job is genuine.
+          </p>
+        </article>
+
+        <p>
+          Official support contact details will be added when configured.
+        </p>
+      </section>
+
+      <!-- ADMIN DASHBOARD -->
       <section id="adminSection" hidden>
         <h2>HUSTLEHUB Admin Dashboard</h2>
-        <p>Manage and publish job listings.</p>
+
+        <p>
+          Authorized administrators can manage job listings here.
+        </p>
 
         <p id="adminMessage" role="status" aria-live="polite">
-          Checking administrator access...
+          Verifying administrator access...
         </p>
 
         <div id="adminPanel" hidden>
-          <form id="adminJobForm">
-            <h3>Add or Edit a Job</h3>
 
-            <label for="adminJobTitle">Job Title *</label>
-            <input id="adminJobTitle" type="text"
-                   required placeholder="e.g. Secondary School Teacher">
+          <section>
+            <h3>Add or Manage a Job</h3>
 
-            <label for="adminCompany">Company / Employer *</label>
-            <input id="adminCompany" type="text"
-                   required placeholder="e.g. Example School">
+            <form id="adminJobForm">
 
-            <label for="adminCounty">County</label>
-            <input id="adminCounty" type="text"
-                   placeholder="e.g. Nairobi">
+              <label for="adminJobTitle">Job title</label>
+              <input
+                id="adminJobTitle"
+                name="title"
+                type="text"
+                required
+              >
 
-            <label for="adminWorkType">Work Type</label>
-            <select id="adminWorkType">
-              <option>Full-time</option>
-              <option>Part-time</option>
-              <option>Contract</option>
-              <option>Internship</option>
-              <option>Remote</option>
-            </select>
+              <label for="adminCompany">Company name</label>
+              <input
+                id="adminCompany"
+                name="company_name"
+                type="text"
+                required
+              >
 
-            <label for="adminCategory">Job Category</label>
-            <input id="adminCategory" type="text"
-                   placeholder="e.g. Education">
+              <label for="adminCounty">County or location</label>
+              <input
+                id="adminCounty"
+                name="county"
+                type="text"
+                value="Kenya"
+                required
+              >
 
-            <label for="adminDescription">Job Description *</label>
-            <textarea id="adminDescription" required rows="5"
-                      placeholder="Describe the duties and requirements."></textarea>
+              <label for="adminWorkType">Work type</label>
+              <select id="adminWorkType" name="work_type" required>
+                <option value="Full-time">Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Contract">Contract</option>
+                <option value="Internship">Internship</option>
+                <option value="Remote">Remote</option>
+              </select>
 
-            <label for="adminApplicationUrl">Application Link</label>
-            <input id="adminApplicationUrl" type="url"
-                   placeholder="https://example.com/apply">
+              <label for="adminCategory">Category</label>
+              <input
+                id="adminCategory"
+                name="category"
+                type="text"
+                value="General"
+                required
+              >
 
-            <label for="adminJobStatus">Listing Status</label>
-            <select id="adminJobStatus">
-              <option value="draft">Save as Draft</option>
-              <option value="published">Publish Job</option>
-            </select>
+              <label for="adminDescription">Job description</label>
+              <textarea
+                id="adminDescription"
+                name="description"
+                rows="5"
+                required
+              ></textarea>
 
-            <button type="submit">Save Job</button>
-          </form>
+              <label for="adminApplicationUrl">
+                Application link (optional)
+              </label>
+              <input
+                id="adminApplicationUrl"
+                name="application_url"
+                type="url"
+                placeholder="https://..."
+              >
+
+              <label for="adminJobStatus">Publication status</label>
+              <select id="adminJobStatus" name="status" required>
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+
+              <button type="submit">Save Job</button>
+            </form>
+          </section>
 
           <section id="adminJobsManager">
-            <h3>Manage Job Listings</h3>
-            <p>View and manage your draft and published jobs.</p>
-            <p id="adminJobsMessage" role="status" aria-live="polite"></p>
+            <h3>Manage Existing Jobs</h3>
+
+            <p
+              id="adminJobsMessage"
+              role="status"
+              aria-live="polite"
+            ></p>
+
             <div id="adminJobsList"></div>
           </section>
 
-          <!-- WALLET ADMIN SETTINGS: FUNCTIONALITY TO BE ADDED -->
+          <!-- WALLET SETTINGS -->
           <section id="adminWalletSettings">
             <h3>Wallet Settings</h3>
+
             <p>
-              The minimum withdrawal setting will be configurable
-              here after secure admin functionality is implemented.
+              Wallet balances and transactions must be managed through
+              secure server-side operations.
             </p>
-            <p id="adminWalletMessage" role="status"></p>
+
+            <p
+              id="adminWalletMessage"
+              role="status"
+              aria-live="polite"
+            ></p>
           </section>
+
         </div>
       </section>
+
     </div>
   </main>
 
   <!-- FIXED BOTTOM NAVIGATION -->
-  <nav id="bottomNavigation" aria-label="Main navigation">
-    <button type="button" class="nav-item active"
-            data-target="homeDashboard" aria-current="page">
+  <nav id="bottomNavigation" aria-label="Main navigation" hidden>
+
+    <button
+      type="button"
+      class="nav-item active"
+      data-target="homeDashboard"
+      aria-current="page"
+    >
       <span class="nav-icon" aria-hidden="true">⌂</span>
       <span>Home</span>
     </button>
 
-    <button type="button" class="nav-item"
-            data-target="walletSection">
+    <button
+      type="button"
+      class="nav-item"
+      data-target="walletSection"
+    >
       <span class="nav-icon" aria-hidden="true">▣</span>
       <span>Wallet</span>
     </button>
 
-    <button type="button" class="nav-item"
-            data-target="jobs">
+    <button
+      type="button"
+      class="nav-item"
+      data-target="jobs"
+    >
       <span class="nav-icon" aria-hidden="true">▤</span>
       <span>Jobs</span>
     </button>
 
-    <button type="button" class="nav-item"
-            data-target="supportSection">
+    <button
+      type="button"
+      class="nav-item"
+      data-target="supportSection"
+    >
       <span class="nav-icon" aria-hidden="true">◎</span>
       <span>Support</span>
     </button>
+
   </nav>
 
+  <!-- FOOTER -->
   <footer>
     <p>HUSTLEHUB · Connecting Kenyans to opportunities</p>
   </footer>
+
+  <!-- DASHBOARD BUTTONS -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll(".dashboard-nav-button").forEach(function (button) {
+        button.addEventListener("click", function () {
+          const target = button.dataset.target;
+          const navigationButton = document.querySelector(
+            '#bottomNavigation [data-target="' + target + '"]'
+          );
+
+          if (navigationButton) {
+            navigationButton.click();
+          }
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
