@@ -22,6 +22,7 @@
       <a class="button" href="#jobs">Explore Jobs</a>
     </section>
 
+    <!-- AVAILABLE JOBS -->
     <section id="jobs">
       <h2>Available Opportunities</h2>
       <p>Explore job opportunities from our database.</p>
@@ -31,121 +32,126 @@
       </div>
 
       <div id="jobsList"></div>
-
-<!-- HUSTLEHUB ADMIN DASHBOARD -->
-<section id="adminSection">
-  <h2>HUSTLEHUB Admin Dashboard</h2>
-  <p>Authorized administrators can add and publish job listings here.</p>
-
-  <p id="adminMessage" role="status">
-    Checking administrator access...
-  </p>
-
-  <div id="adminPanel" hidden>
-    <form id="adminJobForm">
-      <label for="adminJobTitle">Job Title *</label>
-      <input
-        id="adminJobTitle"
-        type="text"
-        required
-        placeholder="e.g. Secondary School Teacher"
-     
-<div id="adminJobsManager">
-  <h3>Manage Job Listings</h3>
-  <p>View, edit, and manage your draft and published jobs here.</p>
-  <div id="adminJobsMessage"></div>
-  <div id="adminJobsList"></div>
-</div>
- >
-
-      <label for="adminCompany">Company / Employer *</label>
-      <input
-        id="adminCompany"
-        type="text"
-        required
-        placeholder="e.g. Example School"
-      >
-
-      <label for="adminCounty">County</label>
-      <input
-        id="adminCounty"
-        type="text"
-        placeholder="e.g. Nairobi"
-      >
-
-      <label for="adminWorkType">Work Type</label>
-      <select id="adminWorkType">
-        <option>Full-time</option>
-        <option>Part-time</option>
-        <option>Contract</option>
-        <option>Internship</option>
-        <option>Remote</option>
-      </select>
-
-      <label for="adminCategory">Job Category</label>
-      <input
-        id="adminCategory"
-        type="text"
-        placeholder="e.g. Education"
-      >
-
-      <label for="adminDescription">Job Description *</label>
-      <textarea
-        id="adminDescription"
-        required
-        rows="5"
-        placeholder="Describe the duties and requirements."
-      ></textarea>
-
-      <label for="adminApplicationUrl">Application Link</label>
-      <input
-        id="adminApplicationUrl"
-        type="url"
-        placeholder="https://example.com/apply"
-      >
-
-      <label for="adminJobStatus">Listing Status</label>
-      <select id="adminJobStatus">
-        <option value="draft">Save as Draft</option>
-        <option value="published">Publish Job</option>
-      </select>
-
-      <button type="submit">Save Job</button>
-    </form>
-  </div>
-</section>
-<!-- END HUSTLEHUB ADMIN DASHBOARD -->
-
     </section>
 
-    <section>
+    <!-- HUSTLEHUB ADMIN DASHBOARD -->
+    <section id="adminSection">
+      <h2>HUSTLEHUB Admin Dashboard</h2>
+      <p>Authorized administrators can add and publish job listings here.</p>
+
+      <p id="adminMessage" role="status">
+        Checking administrator access...
+      </p>
+
+      <div id="adminPanel" hidden>
+        <!-- ADD JOB FORM -->
+        <form id="adminJobForm">
+          <label for="adminJobTitle">Job Title *</label>
+          <input
+            id="adminJobTitle"
+            type="text"
+            required
+            placeholder="e.g. Secondary School Teacher"
+          >
+
+          <label for="adminCompany">Company / Employer *</label>
+          <input
+            id="adminCompany"
+            type="text"
+            required
+            placeholder="e.g. Example School"
+          >
+
+          <label for="adminCounty">County</label>
+          <input
+            id="adminCounty"
+            type="text"
+            placeholder="e.g. Nairobi"
+          >
+
+          <label for="adminWorkType">Work Type</label>
+          <select id="adminWorkType">
+            <option>Full-time</option>
+            <option>Part-time</option>
+            <option>Contract</option>
+            <option>Internship</option>
+            <option>Remote</option>
+          </select>
+
+          <label for="adminCategory">Job Category</label>
+          <input
+            id="adminCategory"
+            type="text"
+            placeholder="e.g. Education"
+          >
+
+          <label for="adminDescription">Job Description *</label>
+          <textarea
+            id="adminDescription"
+            required
+            rows="5"
+            placeholder="Describe the duties and requirements."
+          ></textarea>
+
+          <label for="adminApplicationUrl">Application Link</label>
+          <input
+            id="adminApplicationUrl"
+            type="url"
+            placeholder="https://example.com/apply"
+          >
+
+          <label for="adminJobStatus">Listing Status</label>
+          <select id="adminJobStatus">
+            <option value="draft">Save as Draft</option>
+            <option value="published">Publish Job</option>
+          </select>
+
+          <button type="submit">Save Job</button>
+        </form>
+
+        <!-- MANAGE JOB LISTINGS -->
+        <div id="adminJobsManager">
+          <h3>Manage Job Listings</h3>
+          <p>View and manage your draft and published jobs here.</p>
+
+          <p id="adminJobsMessage" role="status"></p>
+          <div id="adminJobsList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACCOUNT REGISTRATION AND LOGIN -->
+    <section id="accountSection">
       <h2>Create an Account</h2>
+
       <form id="signupForm">
-        <label>Full name
-          <input id="signupName" type="text" required>
-        </label>
+        <label for="signupName">Full name</label>
+        <input id="signupName" type="text" required>
 
-        <label>Email
-          <input id="signupEmail" type="email" required>
-        </label>
+        <label for="signupEmail">Email</label>
+        <input id="signupEmail" type="email" required>
 
-        <label>Password (at least 8 characters)
-          <input id="signupPassword" type="password"
-                 minlength="8" required>
+        <label for="signupPassword">
+          Password (at least 8 characters)
         </label>
+        <input
+          id="signupPassword"
+          type="password"
+          minlength="8"
+          required
+        >
 
         <button type="submit">Register</button>
       </form>
 
       <h2>Log In</h2>
-      <form id="loginForm">
-        <label>Email
-          <input id="loginEmail" type="email" required>
-        </label>
 
-        <label>Password
-          <input id="loginPassword" type="password" required>
-        </label>
+      <form id="loginForm">
+        <label for="loginEmail">Email</label>
+        <input id="loginEmail" type="email" required>
+
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" required>
 
         <button type="submit">Log In</button>
       </form>
