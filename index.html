@@ -16,13 +16,14 @@
   </header>
 
   <main>
+    <!-- HOME -->
     <section class="hero">
       <h1>Your next opportunity starts here!</h1>
       <p>Discover opportunities and take the next step in your career.</p>
       <a class="button" href="#jobs">Explore Jobs</a>
     </section>
 
-    <!-- AVAILABLE JOBS -->
+    <!-- PUBLIC JOB LISTINGS -->
     <section id="jobs">
       <h2>Available Opportunities</h2>
       <p>Explore job opportunities from our database.</p>
@@ -34,7 +35,7 @@
       <div id="jobsList"></div>
     </section>
 
-    <!-- HUSTLEHUB ADMIN DASHBOARD -->
+    <!-- ADMIN DASHBOARD -->
     <section id="adminSection">
       <h2>HUSTLEHUB Admin Dashboard</h2>
       <p>Authorized administrators can add and publish job listings here.</p>
@@ -44,7 +45,8 @@
       </p>
 
       <div id="adminPanel" hidden>
-        <!-- ADD JOB FORM -->
+
+        <!-- ADD A JOB -->
         <form id="adminJobForm">
           <label for="adminJobTitle">Job Title *</label>
           <input
@@ -109,18 +111,21 @@
           <button type="submit">Save Job</button>
         </form>
 
-        <!-- MANAGE JOB LISTINGS -->
-        <div id="adminJobsManager">
+        <!-- MANAGE JOBS: OUTSIDE THE ADD-JOB FORM -->
+        <section id="adminJobsManager">
           <h3>Manage Job Listings</h3>
-          <p>View and manage your draft and published jobs here.</p>
+          <p>
+            View and manage your draft and published jobs here.
+          </p>
 
           <p id="adminJobsMessage" role="status"></p>
           <div id="adminJobsList"></div>
-        </div>
+        </section>
+
       </div>
     </section>
 
-    <!-- ACCOUNT REGISTRATION AND LOGIN -->
+    <!-- REGISTRATION AND LOGIN -->
     <section id="accountSection">
       <h2>Create an Account</h2>
 
