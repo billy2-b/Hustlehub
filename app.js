@@ -1,7 +1,7 @@
 
 /*
  * HUSTLEHUB
- * Authentication, published jobs and admin dashboard
+ * Authentication, public jobs, admin job management
  */
 
 (() => {
@@ -10,7 +10,7 @@
   const SUPABASE_URL =
     "https://osumagzwxvyaepycksin.supabase.co";
 
-  // Keep your existing Supabase publishable key here.
+  // Replace this placeholder with your existing publishable key.
   const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_YdkCAt_7EHlSOB7MDgZ0Rg_EJ89I0NJ";
 
@@ -26,9 +26,7 @@
   }
 
   function setButtonLoading(form, loading, text) {
-    const button = form.querySelector(
-      'button[type="submit"], button:not([type])'
-    );
+    const button = form?.querySelector('button[type="submit"]');
     if (!button) return;
 
     if (loading) {
@@ -51,7 +49,7 @@
       "PASTE_YOUR_EXISTING_SUPABASE_PUBLISHABLE_KEY_HERE"
   ) {
     showAuthMessage(
-      "Setup incomplete. Check the Supabase library and publishable key.",
+      "Setup incomplete. Add your Supabase publishable key in app.js.",
       true
     );
     return;
@@ -64,22 +62,43 @@
 
   window.hustlehubSupabase = client;
 
-  // LOAD PUBLISHED JOBS
+  // ACCOUNT VIEW
+
+  function updateAccountUI(user) {
+    const authForms = document.getElementById("authForms");
+    const signedInPanel =
+      document.getElementById("signedInPanel");
+    const signedInMessage =
+      document.getElementById("signedInMessage");
+
+    if (!authForms || !signedInPanel) return;
+
+    authForms.hidden = Boolean(user);
+    signedInPanel.hidden = !user;
+
+    if (user && signedInMessage) {
+      signedInMessage.textContent =
+        "You are signed in as " +
+        (user.email || "a HUSTLEHUB user") + ".";
+    }
+  }
+
+  // LOAD PUBLIC JOBS
 
   async function loadJobs() {
-    const jobsList = document.getElementById("jobsList");
-    const jobsMessage = document.getElementById("jobsMessage");
+    const list = document.getElementById("jobsList");
+    const message = document.getElementById("jobsMessage");
 
-    if (!jobsList || !jobsMessage) return;
+    if (!list || !message) return;
 
-    jobsMessage.textContent = "Loading available jobs...";
-    jobsList.replaceChildren();
+    message.textContent = "Loading available jobs...";
+    list.replaceChildren();
 
     try {
       const { data: jobs, error } = await client
         .from("jobs")
         .select(
-          "id, title, company_name, county, work_type, category, description, application_url, verified, created_at"
+          "id,title,company_name,county,work_type,category,description,application_url,verified,created_at"
         )
         .eq("status", "published")
         .order("created_at", { ascending: false });
@@ -87,12 +106,12 @@
       if (error) throw error;
 
       if (!jobs || jobs.length === 0) {
-        jobsMessage.textContent =
+        message.textContent =
           "No published jobs are available yet.";
         return;
       }
 
-      jobsMessage.textContent =
+      message.textContent =
         `${jobs.length} published job${jobs.length === 1 ? "" : "s"} found.`;
 
       jobs.forEach((job) => {
@@ -100,11 +119,11 @@
         card.className = "job-card";
 
         const title = document.createElement("h3");
-        title.textContent = job.title;
+        title.textContent = job.title || "Untitled job";
 
         const company = document.createElement("p");
         company.textContent =
-          `${job.company_name} · ${job.county || "Kenya"}`;
+          `${job.company_name || "Employer not specified"} · ${job.county || "Kenya"}`;
 
         const details = document.createElement("p");
         details.textContent =
@@ -113,13 +132,12 @@
         const description = document.createElement("p");
         description.textContent = job.description || "";
 
-        card.append(title, company, details, description);
-
         const verification = document.createElement("p");
         verification.textContent = job.verified
           ? "Verified listing"
           : "Verification not confirmed by HUSTLEHUB.";
-        card.appendChild(verification);
+
+        card.append(title, company, details, description, verification);
 
         if (job.application_url) {
           try {
@@ -134,15 +152,15 @@
               card.appendChild(link);
             }
           } catch {
-            // Ignore invalid application links.
+            // Do not display invalid application links.
           }
         }
 
-        jobsList.appendChild(card);
+        list.appendChild(card);
       });
     } catch (error) {
       console.error("HUSTLEHUB jobs error:", error);
-      jobsMessage.textContent =
+      message.textContent =
         "We couldn't load jobs. Please refresh and try again.";
     }
   }
@@ -166,7 +184,7 @@
 
       if (!user) {
         message.textContent =
-          "Please log in with your authorized administrator account.";
+          "Log in with your authorized administrator account to access the dashboard.";
         return;
       }
 
@@ -179,8 +197,7 @@
       if (profileError) throw profileError;
 
       if (!profile) {
-        message.textContent =
-          "No profile found for this account. Check your Supabase profile.";
+        message.textContent = "No profile found for this account.";
         return;
       }
 
@@ -196,9 +213,32 @@
     } catch (error) {
       console.error("HUSTLEHUB admin check failed:", error);
       message.textContent =
-        "Admin check error: " +
-        (error.message || String(error));
+        "Admin check error: " + (error.message || String(error));
     }
+  }
+
+  // VERIFY ADMIN BEFORE WRITING
+
+  async function verifyAdmin() {
+    const { data, error } = await client.auth.getSession();
+    if (error) throw error;
+
+    const user = data.session?.user;
+    if (!user) throw new Error("Please log in again.");
+
+    const { data: profile, error: profileError } = await client
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError) throw profileError;
+
+    if (profile?.role !== "admin") {
+      throw new Error("Administrator access required.");
+    }
+
+    return user;
   }
 
   // ADD A JOB
@@ -206,38 +246,15 @@
   async function addHustleHubJob(event) {
     event.preventDefault();
 
-    const message = document.getElementById("adminMessage");
     const form = document.getElementById("adminJobForm");
+    const message = document.getElementById("adminMessage");
 
     if (!form || !message) return;
 
     const button = form.querySelector('button[type="submit"]');
 
     try {
-      const { data: sessionData, error: sessionError } =
-        await client.auth.getSession();
-
-      if (sessionError) throw sessionError;
-
-      const user = sessionData.session?.user;
-
-      if (!user) {
-        message.textContent = "Please log in again.";
-        return;
-      }
-
-      const { data: profile, error: profileError } = await client
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (profileError) throw profileError;
-
-      if (profile?.role !== "admin") {
-        message.textContent = "Access denied.";
-        return;
-      }
+      await verifyAdmin();
 
       const title =
         document.getElementById("adminJobTitle").value.trim();
@@ -271,11 +288,11 @@
         try {
           const url = new URL(applicationUrl);
           if (!["https:", "http:"].includes(url.protocol)) {
-            throw new Error("Invalid URL protocol");
+            throw new Error("Invalid link");
           }
         } catch {
           message.textContent =
-            "Enter a valid application link beginning with https:// or http://.";
+            "Enter a valid application link starting with https:// or http://.";
           return;
         }
       }
@@ -302,17 +319,17 @@
 
       form.reset();
       await loadJobs();
+      await loadAdminJobs();
     } catch (error) {
       console.error("HUSTLEHUB save-job error:", error);
       message.textContent =
-        "Could not save job: " +
-        (error.message || "Check your database permissions.");
+        "Could not save job: " + (error.message || "Please try again.");
     } finally {
       if (button) button.disabled = false;
     }
   }
 
-  // REGISTRATION WITH CORRECT EMAIL REDIRECT
+  // REGISTRATION
 
   const signupForm = document.getElementById("signupForm");
 
@@ -333,10 +350,7 @@
       }
 
       if (password.length < 8) {
-        showAuthMessage(
-          "Your password must contain at least 8 characters.",
-          true
-        );
+        showAuthMessage("Password must contain at least 8 characters.", true);
         return;
       }
 
@@ -359,10 +373,11 @@
           showAuthMessage(
             "Registration received! Check your email for a confirmation link."
           );
+        } else if (data.session?.user) {
+          updateAccountUI(data.session.user);
+          showAuthMessage("Your HUSTLEHUB account is ready.");
         } else {
-          showAuthMessage(
-            "Your account was created successfully. You can now log in."
-          );
+          showAuthMessage("Account created. You can now log in.");
         }
 
         signupForm.reset();
@@ -405,11 +420,12 @@
 
         if (error) throw error;
 
-        if (data.user) {
-          showAuthMessage("Login successful! Welcome to HUSTLEHUB.");
-          loginForm.reset();
-          await checkHustleHubAdmin();
-        }
+        updateAccountUI(data.user);
+        showAuthMessage("Login successful! Welcome to HUSTLEHUB.");
+
+        loginForm.reset();
+        await checkHustleHubAdmin();
+        await loadAdminJobs();
       } catch (error) {
         console.error("HUSTLEHUB login error:", error);
         showAuthMessage(
@@ -422,66 +438,80 @@
     });
   }
 
+  // LOG OUT
 
-  // LOAD ALL JOBS FOR THE ADMIN DASHBOARD
+  const logoutButton = document.getElementById("logoutButton");
+
+  if (logoutButton) {
+    logoutButton.addEventListener("click", async () => {
+      logoutButton.disabled = true;
+      showAuthMessage("Logging out...");
+
+      try {
+        const { error } = await client.auth.signOut();
+        if (error) throw error;
+
+        updateAccountUI(null);
+        showAuthMessage("You have logged out successfully.");
+        await checkHustleHubAdmin();
+        await loadAdminJobs();
+      } catch (error) {
+        showAuthMessage(
+          error.message || "Logout failed. Please try again.",
+          true
+        );
+      } finally {
+        logoutButton.disabled = false;
+      }
+    });
+  }
+
+  // LOAD ADMIN JOBS
+
   async function loadAdminJobs() {
     const list = document.getElementById("adminJobsList");
     const message = document.getElementById("adminJobsMessage");
 
     if (!list || !message) return;
 
-    list.textContent = "Loading job listings...";
+    list.replaceChildren();
     message.textContent = "";
 
     try {
-      const { data: sessionData, error: sessionError } =
-        await client.auth.getSession();
-
-      if (sessionError) throw sessionError;
-      if (!sessionData.session?.user) {
-        list.textContent = "Please log in as an administrator.";
-        return;
-      }
-
-      const { data: profile, error: profileError } = await client
-        .from("profiles")
-        .select("role")
-        .eq("id", sessionData.session.user.id)
-        .maybeSingle();
-
-      if (profileError) throw profileError;
-      if (profile?.role !== "admin") {
-        list.textContent = "Administrator access required.";
-        return;
-      }
-
-      const { data: jobs, error } = await client
-        .from("jobs")
-        .select("id, title, company_name, county, work_type, category, description, application_url, status, created_at")
-        .order("created_at", { ascending: false });
-
+      const { data, error } = await client.auth.getSession();
       if (error) throw error;
 
-      list.replaceChildren();
+      if (!data.session?.user) {
+        message.textContent = "Log in as an administrator to manage jobs.";
+        return;
+      }
+
+      await verifyAdmin();
+
+      const { data: jobs, error: jobsError } = await client
+        .from("jobs")
+        .select(
+          "id,title,company_name,county,work_type,category,description,application_url,status,created_at"
+        )
+        .order("created_at", { ascending: false });
+
+      if (jobsError) throw jobsError;
 
       if (!jobs || jobs.length === 0) {
-        list.textContent = "No job listings found.";
+        message.textContent = "No job listings found.";
         return;
       }
 
       jobs.forEach((job) => {
-        const card = document.createElement("div");
-        card.style.border = "1px solid #ccc";
-        card.style.padding = "12px";
-        card.style.marginBottom = "12px";
+        const card = document.createElement("article");
+        card.className = "job-card";
 
         const heading = document.createElement("h4");
         heading.textContent = job.title;
 
         const details = document.createElement("p");
         details.textContent =
-          job.company_name + " · " + job.county +
-          " · " + job.work_type + " · " + job.category;
+          `${job.company_name} · ${job.county || "Kenya"} · ${job.work_type || "Not specified"}`;
 
         const status = document.createElement("p");
         status.textContent = "Status: " + job.status;
@@ -501,19 +531,21 @@
           message.textContent = "Updating job...";
 
           try {
-            const { error: updateError } = await client
+            await verifyAdmin();
+
+            const { error } = await client
               .from("jobs")
               .update({ status: nextStatus })
               .eq("id", job.id);
 
-            if (updateError) throw updateError;
+            if (error) throw error;
 
             message.textContent = "Job status updated.";
             await loadAdminJobs();
             await loadJobs();
-          } catch (err) {
+          } catch (error) {
             message.textContent =
-              "Update failed: " + (err.message || "Please try again.");
+              "Update failed: " + (error.message || "Please try again.");
             toggle.disabled = false;
           }
         });
@@ -521,7 +553,6 @@
         const remove = document.createElement("button");
         remove.type = "button";
         remove.textContent = "Delete";
-        remove.style.marginLeft = "8px";
 
         remove.addEventListener("click", async () => {
           if (!confirm("Permanently delete this job listing?")) return;
@@ -530,19 +561,21 @@
           message.textContent = "Deleting job...";
 
           try {
-            const { error: deleteError } = await client
+            await verifyAdmin();
+
+            const { error } = await client
               .from("jobs")
               .delete()
               .eq("id", job.id);
 
-            if (deleteError) throw deleteError;
+            if (error) throw error;
 
             message.textContent = "Job deleted.";
             await loadAdminJobs();
             await loadJobs();
-          } catch (err) {
+          } catch (error) {
             message.textContent =
-              "Delete failed: " + (err.message || "Please try again.");
+              "Delete failed: " + (error.message || "Please try again.");
             remove.disabled = false;
           }
         });
@@ -550,13 +583,14 @@
         card.append(heading, details, status, toggle, remove);
         list.appendChild(card);
       });
-    } catch (err) {
-      console.error("HUSTLEHUB admin jobs error:", err);
-      list.textContent = "Could not load jobs. Please try again.";
-      message.textContent = err.message || "Check your connection.";
+    } catch (error) {
+      console.error("HUSTLEHUB admin jobs error:", error);
+      message.textContent =
+        "Could not load admin jobs: " + (error.message || "Please try again.");
     }
   }
-  // INITIALIZE WEBSITE
+
+  // INITIALIZE
 
   async function initializeHustleHub() {
     const adminForm = document.getElementById("adminJobForm");
@@ -566,17 +600,20 @@
     }
 
     await loadJobs();
-await checkHustleHubAdmin();
-await loadAdminJobs();
 
     const { data, error } = await client.auth.getSession();
 
     if (error) {
-      console.error("Session check error:", error);
+      console.error("HUSTLEHUB session error:", error);
+      showAuthMessage("Could not check your session. Refresh and try again.", true);
       return;
     }
 
-    if (data.session) {
+    updateAccountUI(data.session?.user || null);
+    await checkHustleHubAdmin();
+    await loadAdminJobs();
+
+    if (data.session?.user) {
       showAuthMessage("You are signed in to HUSTLEHUB.");
     }
   }
@@ -591,13 +628,17 @@ await loadAdminJobs();
     initializeHustleHub();
   }
 
-  
-client.auth.onAuthStateChange((event) => {
-  if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
-    setTimeout(async () => {
-      await checkHustleHubAdmin();
-      await loadAdminJobs();
-    }, 0);
-  }
-});
-
+  client.auth.onAuthStateChange((event, session) => {
+    if (
+      event === "SIGNED_IN" ||
+      event === "SIGNED_OUT" ||
+      event === "TOKEN_REFRESHED"
+    ) {
+      setTimeout(() => {
+        updateAccountUI(session?.user || null);
+        checkHustleHubAdmin();
+        loadAdminJobs();
+      }, 0);
+    }
+  });
+})();
