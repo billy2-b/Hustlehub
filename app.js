@@ -422,6 +422,140 @@
     });
   }
 
+
+  // LOAD ALL JOBS FOR THE ADMIN DASHBOARD
+  async function loadAdminJobs() {
+    const list = document.getElementById("adminJobsList");
+    const message = document.getElementById("adminJobsMessage");
+
+    if (!list || !message) return;
+
+    list.textContent = "Loading job listings...";
+    message.textContent = "";
+
+    try {
+      const { data: sessionData, error: sessionError } =
+        await client.auth.getSession();
+
+      if (sessionError) throw sessionError;
+      if (!sessionData.session?.user) {
+        list.textContent = "Please log in as an administrator.";
+        return;
+      }
+
+      const { data: profile, error: profileError } = await client
+        .from("profiles")
+        .select("role")
+        .eq("id", sessionData.session.user.id)
+        .maybeSingle();
+
+      if (profileError) throw profileError;
+      if (profile?.role !== "admin") {
+        list.textContent = "Administrator access required.";
+        return;
+      }
+
+      const { data: jobs, error } = await client
+        .from("jobs")
+        .select("id, title, company_name, county, work_type, category, description, application_url, status, created_at")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      list.replaceChildren();
+
+      if (!jobs || jobs.length === 0) {
+        list.textContent = "No job listings found.";
+        return;
+      }
+
+      jobs.forEach((job) => {
+        const card = document.createElement("div");
+        card.style.border = "1px solid #ccc";
+        card.style.padding = "12px";
+        card.style.marginBottom = "12px";
+
+        const heading = document.createElement("h4");
+        heading.textContent = job.title;
+
+        const details = document.createElement("p");
+        details.textContent =
+          job.company_name + " · " + job.county +
+          " · " + job.work_type + " · " + job.category;
+
+        const status = document.createElement("p");
+        status.textContent = "Status: " + job.status;
+
+        const toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.textContent =
+          job.status === "published" ? "Unpublish" : "Publish";
+
+        toggle.addEventListener("click", async () => {
+          const nextStatus =
+            job.status === "published" ? "draft" : "published";
+
+          if (!confirm("Change this job to " + nextStatus + "?")) return;
+
+          toggle.disabled = true;
+          message.textContent = "Updating job...";
+
+          try {
+            const { error: updateError } = await client
+              .from("jobs")
+              .update({ status: nextStatus })
+              .eq("id", job.id);
+
+            if (updateError) throw updateError;
+
+            message.textContent = "Job status updated.";
+            await loadAdminJobs();
+            await loadJobs();
+          } catch (err) {
+            message.textContent =
+              "Update failed: " + (err.message || "Please try again.");
+            toggle.disabled = false;
+          }
+        });
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "Delete";
+        remove.style.marginLeft = "8px";
+
+        remove.addEventListener("click", async () => {
+          if (!confirm("Permanently delete this job listing?")) return;
+
+          remove.disabled = true;
+          message.textContent = "Deleting job...";
+
+          try {
+            const { error: deleteError } = await client
+              .from("jobs")
+              .delete()
+              .eq("id", job.id);
+
+            if (deleteError) throw deleteError;
+
+            message.textContent = "Job deleted.";
+            await loadAdminJobs();
+            await loadJobs();
+          } catch (err) {
+            message.textContent =
+              "Delete failed: " + (err.message || "Please try again.");
+            remove.disabled = false;
+          }
+        });
+
+        card.append(heading, details, status, toggle, remove);
+        list.appendChild(card);
+      });
+    } catch (err) {
+      console.error("HUSTLEHUB admin jobs error:", err);
+      list.textContent = "Could not load jobs. Please try again.";
+      message.textContent = err.message || "Check your connection.";
+    }
+  }
   // INITIALIZE WEBSITE
 
   async function initializeHustleHub() {
@@ -432,7 +566,8 @@
     }
 
     await loadJobs();
-    await checkHustleHubAdmin();
+await checkHustleHubAdmin();
+await loadAdminJobs();
 
     const { data, error } = await client.auth.getSession();
 
@@ -456,9 +591,13 @@
     initializeHustleHub();
   }
 
-  client.auth.onAuthStateChange((event) => {
-    if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
-      setTimeout(checkHustleHubAdmin, 0);
-    }
-  });
-})();
+  
+client.auth.onAuthStateChange((event) => {
+  if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+    setTimeout(async () => {
+      await checkHustleHubAdmin();
+      await loadAdminJobs();
+    }, 0);
+  }
+});
+
