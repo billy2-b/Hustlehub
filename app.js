@@ -399,76 +399,92 @@
     setText("homeGreeting", "HELLO, " + name);
     setText("signedInMessage", "Welcome to HUSTLEHUB, " + name + ".");
 
+  
     // ==========================================
     // ACCOUNT ACTIVATION PANEL
+    // JOB SEEKERS ONLY
     // ==========================================
 
     const homeDashboard = $("homeDashboard");
+    let activationPanel = $("hustlehubActivationPanel");
 
-    if (homeDashboard) {
-      let activationPanel = $("hustlehubActivationPanel");
+    if (currentProfile.role !== "admin") {
+      if (homeDashboard) {
+        if (!activationPanel) {
+          activationPanel = document.createElement("section");
+          activationPanel.id = "hustlehubActivationPanel";
+          activationPanel.className = "activation-card";
 
-      if (!activationPanel) {
-        activationPanel = document.createElement("section");
-        activationPanel.id = "hustlehubActivationPanel";
-        activationPanel.className = "activation-card";
+          const greeting = $("homeGreeting");
 
-        const greeting = $("homeGreeting");
+          if (greeting && greeting.parentElement) {
+            greeting.insertAdjacentElement(
+              "afterend",
+              activationPanel
+            );
+          } else {
+            homeDashboard.prepend(activationPanel);
+          }
+        }
 
-        if (greeting && greeting.parentElement) {
-          greeting.insertAdjacentElement("afterend", activationPanel);
+        activationPanel.replaceChildren();
+
+        const activationTitle = document.createElement("h3");
+        const activationStatus = document.createElement("p");
+        const activationDetails = document.createElement("p");
+
+        if (currentProfile.is_activated === true) {
+          activationTitle.textContent = "Account Activated";
+
+          activationStatus.textContent =
+            "Your HUSTLEHUB account is active.";
+
+          activationDetails.textContent =
+            "You can continue using your account.";
+
+          activationPanel.append(
+            activationTitle,
+            activationStatus,
+            activationDetails
+          );
+
         } else {
-          homeDashboard.prepend(activationPanel);
+          activationTitle.textContent = "Account Not Activated";
+
+          activationStatus.textContent =
+            "Your account is currently awaiting activation.";
+
+          activationDetails.textContent =
+            "Account activation is not connected to payment yet. " +
+            "No payment is required through this button.";
+
+          const activateButton = document.createElement("button");
+          activateButton.type = "button";
+          activateButton.textContent = "Activate Account";
+
+          activateButton.addEventListener("click", () => {
+            activationDetails.textContent =
+              "Activation payments are not enabled yet. " +
+              "No payment has been requested. " +
+              "Please check back when activation is available.";
+          });
+
+          activationPanel.append(
+            activationTitle,
+            activationStatus,
+            activationDetails,
+            activateButton
+          );
         }
       }
 
-      activationPanel.replaceChildren();
-
-      const activationTitle = document.createElement("h3");
-      const activationStatus = document.createElement("p");
-      const activationDetails = document.createElement("p");
-
-      if (currentProfile.is_activated === true) {
-        activationTitle.textContent = "Account Activated";
-        activationStatus.textContent =
-          "Your HUSTLEHUB account is active.";
-        activationDetails.textContent =
-          "You can continue using your account.";
-      } else {
-        activationTitle.textContent = "Account Not Activated";
-        activationStatus.textContent =
-          "Your account is currently awaiting activation.";
-        activationDetails.textContent =
-          "Account activation is not connected to payment yet. " +
-          "No payment is required through this button.";
-
-        const activateButton = document.createElement("button");
-        activateButton.type = "button";
-        activateButton.textContent = "Activate Account";
-
-        activateButton.addEventListener("click", () => {
-          activationDetails.textContent =
-            "Activation payments are not enabled yet. " +
-            "No payment has been requested. " +
-            "Please check back when activation is available.";
-        });
-
-        activationPanel.append(
-          activationTitle,
-          activationStatus,
-          activationDetails,
-          activateButton
-        );
-      }
-
-      if (currentProfile.is_activated === true) {
-        activationPanel.append(
-          activationTitle,
-          activationStatus,
-          activationDetails
-        );
+    } else {
+      // Remove the activation panel from the admin dashboard.
+      if (activationPanel) {
+        activationPanel.remove();
       }
     }
+
 
     const isAdmin = currentProfile.role === "admin";
 
