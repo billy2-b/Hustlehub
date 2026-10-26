@@ -475,6 +475,7 @@
 
   <main>
 
+   
     <!-- LOGIN AND REGISTRATION -->
     <section id="accountSection">
 
@@ -485,6 +486,7 @@
 
       <div id="authForms" class="auth-grid">
 
+        <!-- LOGIN -->
         <section class="card">
           <h2>Welcome back</h2>
           <p class="muted">Log in to your HUSTLEHUB account.</p>
@@ -517,14 +519,23 @@
             </button>
           </form>
 
-          <p id="authMessage" class="message" role="status" aria-live="polite"></p>
+          <p
+            id="authMessage"
+            class="message"
+            role="status"
+            aria-live="polite"
+          ></p>
         </section>
 
+        <!-- REGISTRATION -->
         <section class="card">
           <h2>Create an account</h2>
-          <p class="muted">Join HUSTLEHUB to explore opportunities.</p>
+          <p class="muted">
+            Join HUSTLEHUB to explore opportunities.
+          </p>
 
           <form id="signupForm">
+
             <div class="form-group">
               <label for="signupName">Full name</label>
               <input
@@ -560,9 +571,33 @@
               >
             </div>
 
+            <!-- OPTIONAL REFERRAL CODE -->
+            <div class="form-group">
+              <label for="signupReferralCode">
+                Referral code (optional)
+              </label>
+
+              <input
+                id="signupReferralCode"
+                name="referral_code"
+                type="text"
+                maxlength="20"
+                autocomplete="off"
+                placeholder="Example: HHF75E9A143F"
+                autocapitalize="characters"
+              >
+
+              <small class="muted">
+                Have a HUSTLEHUB referral code?
+                Enter it here to connect your account to the person
+                who referred you.
+              </small>
+            </div>
+
             <button class="btn btn-gold" type="submit">
               Register
             </button>
+
           </form>
         </section>
 
