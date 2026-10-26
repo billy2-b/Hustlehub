@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -381,6 +380,19 @@
       font-size: 13px;
     }
 
+    .support-card h3 {
+      color: var(--green);
+      margin-bottom: 5px;
+    }
+
+    .support-card p {
+      margin-top: 5px;
+    }
+
+    .support-card li {
+      margin-bottom: 8px;
+    }
+
     .bottom-nav {
       position: fixed;
       z-index: 1000;
@@ -739,8 +751,7 @@
         </section>
       </section>
 
-
-      <!-- WALLET PAGE -->
+      <!-- WALLET PAGE: CONTINUES IN PART 2 -->
       <section id="walletSection" hidden>
         <div class="card">
           <h2>My wallet</h2>
@@ -774,9 +785,9 @@
           </div>
 
           <p id="walletMessage" class="message" role="status" aria-live="polite"></p>
-        </div>
+        </div>        <div class="wallet-grid">
 
-        <div class="wallet-grid">
+          <!-- DEPOSIT -->
           <section class="card">
             <h2>Deposit</h2>
             <p class="muted">Enter your details to validate the form.</p>
@@ -825,6 +836,7 @@
             </p>
           </section>
 
+          <!-- WITHDRAW -->
           <section class="card">
             <h2>Withdraw</h2>
             <p class="muted">Enter your details to validate the form.</p>
@@ -871,8 +883,10 @@
               Withdrawals are currently disabled. No money will be sent.
             </p>
           </section>
+
         </div>
 
+        <!-- TRANSACTION HISTORY -->
         <section class="card">
           <h2>Transaction history</h2>
           <div id="walletTransactionsList">
@@ -904,28 +918,203 @@
         </div>
       </section>
 
-      <!-- SUPPORT PAGE -->
+      <!-- EXPANDED SUPPORT PAGE -->
       <section id="supportSection" hidden>
-        <div class="card">
-          <h2>HUSTLEHUB support</h2>
 
+        <div class="hero">
+          <p class="gold-text">WE ARE HERE TO HELP</p>
+          <h1>HUSTLEHUB Support</h1>
           <p>
-            Need help with your account or an opportunity? Use your official
-            HUSTLEHUB support contact when one has been provided.
+            Find answers to common questions about your account,
+            jobs, wallet, and using HUSTLEHUB safely.
+          </p>
+        </div>
+
+        <!-- GETTING STARTED -->
+        <section class="card support-card">
+          <h2>Getting started</h2>
+
+          <h3>How do I create an account?</h3>
+          <p>
+            Open HUSTLEHUB and complete the registration form using
+            your full name, email address, and a secure password.
+            Use an email address you can access.
+          </p>
+
+          <h3>How do I log in?</h3>
+          <p>
+            Enter the email address and password you used when
+            registering. If you cannot log in, check that your
+            details are correct.
+          </p>
+
+          <h3>What if I have trouble accessing my account?</h3>
+          <p>
+            Check your internet connection and confirm that you
+            entered the correct email address. If the problem
+            continues, contact HUSTLEHUB support through an
+            official support channel when one is available.
+          </p>
+        </section>
+
+        <!-- JOBS HELP -->
+        <section class="card support-card">
+          <h2>Jobs and opportunities</h2>
+
+          <h3>How do I find jobs?</h3>
+          <p>
+            Log in to your account and open the Jobs page.
+            Browse the available opportunities and read each
+            listing carefully.
+          </p>
+
+          <h3>How do I apply for a job?</h3>
+          <p>
+            Open the opportunity you are interested in and follow
+            its application instructions. Some employers may
+            provide an external application link.
+          </p>
+
+          <h3>Why can't I see a job I expected?</h3>
+          <p>
+            Only opportunities that are available to job seekers
+            will appear in the Jobs section. A listing may have
+            been unpublished, removed, or may no longer be
+            available.
+          </p>
+
+          <div class="notice">
+            <strong>Stay alert:</strong>
+            Verify employers and application details. Be cautious
+            of anyone promising guaranteed employment in exchange
+            for unexpected payments.
+          </div>
+        </section>
+
+        <!-- ACCOUNT ACTIVATION -->
+        <section class="card support-card">
+          <h2>Account activation</h2>
+
+          <h3>What does account activation mean?</h3>
+          <p>
+            Account activation refers to the process of confirming
+            that your HUSTLEHUB account meets the platform's
+            activation requirements.
+          </p>
+
+          <h3>What should I do if my account is not activated?</h3>
+          <p>
+            Check your account status and follow the instructions
+            shown by HUSTLEHUB. If the status does not update,
+            seek help through an official support channel.
           </p>
 
           <p class="notice">
-            Never share your password, M-Pesa PIN, or verification codes with
-            anyone. Be cautious of job offers that demand unexpected fees.
+            Do not send money to personal numbers or make payments
+            based on messages from unverified people claiming to
+            represent HUSTLEHUB.
+          </p>
+        </section>
+
+        <!-- WALLET HELP -->
+        <section class="card support-card">
+          <h2>Wallet and transactions</h2>
+
+          <h3>Why is my wallet balance KSh 0.00?</h3>
+          <p>
+            Your wallet may show zero when no funds have been
+            credited to it. Check your transaction history for
+            available records.
           </p>
 
-          <h3>Before applying for a job</h3>
+          <h3>Why are deposits or withdrawals unavailable?</h3>
+          <p>
+            Wallet payment features may be unavailable while
+            payment services are being prepared or maintained.
+            Follow the notices displayed on the Wallet page.
+          </p>
+
+          <h3>Where can I see my transactions?</h3>
+          <p>
+            Open the Wallet page and look under Transaction
+            history. Available transaction records will appear
+            there.
+          </p>
+        </section>
+
+        <!-- REFERRALS -->
+        <section class="card support-card">
+          <h2>Referrals and rewards</h2>
+
+          <h3>What are referral rewards?</h3>
+          <p>
+            Referral rewards are benefits associated with eligible
+            referrals, according to the HUSTLEHUB referral rules.
+          </p>
+
+          <h3>Why have I not received a referral reward?</h3>
+          <p>
+            A referral may need to meet the platform's eligibility
+            and verification requirements before a reward is
+            credited. Check your wallet for available records.
+          </p>
+        </section>
+
+        <!-- ACCOUNT AND JOB SAFETY -->
+        <section class="card support-card">
+          <h2>Account and job safety</h2>
+
           <ul>
-            <li>Check that the employer and opportunity are genuine.</li>
-            <li>Read the application instructions carefully.</li>
-            <li>Never pay a recruiter simply to guarantee employment.</li>
+            <li>
+              Keep your password private and use a strong,
+              unique password.
+            </li>
+            <li>
+              Never share your M-Pesa PIN, password, or
+              verification codes with anyone.
+            </li>
+            <li>
+              Check the employer and job details before applying.
+            </li>
+            <li>
+              Be cautious of job offers that promise guaranteed
+              employment or unusually high earnings.
+            </li>
+            <li>
+              Do not make unexpected payments to individuals
+              claiming to be recruiters or support agents.
+            </li>
           </ul>
-        </div>
+
+          <p class="notice">
+            HUSTLEHUB users should protect their personal
+            information and report suspicious activity through
+            an official support channel when available.
+          </p>
+        </section>
+
+        <!-- CONTACT SUPPORT -->
+        <section class="card support-card">
+          <h2>Contact support</h2>
+
+          <p>
+            If you need help that is not covered above, contact
+            HUSTLEHUB through its official support contact once
+            that contact has been published.
+          </p>
+
+          <p class="muted">
+            When reporting a problem, explain what happened and
+            include the page where you experienced the issue.
+            Do not include your password, M-Pesa PIN, or
+            verification codes.
+          </p>
+
+          <p class="gold-text">
+            HUSTLEHUB · Connecting Kenyans to opportunities
+          </p>
+        </section>
+
       </section>
 
     </section>
