@@ -301,11 +301,14 @@
           email,
           password,
           options: {
-            data: {
-              full_name: fullName
-            },
-            emailRedirectTo: SITE_URL
-          }
+  data: {
+    full_name: fullName,
+    referral_code: (
+      $("signupReferralCode")?.value || ""
+    ).trim().toUpperCase()
+  },
+  emailRedirectTo: SITE_URL
+}
         });
 
         if (error) throw error;
