@@ -489,20 +489,21 @@
     }
 
 
-    const isAdmin = currentProfile.role === "admin";
+    
+const isAdmin = currentProfile.role === "admin";
 
+setHidden("adminSection", !isAdmin);
 
-    setHidden("adminSection", !isAdmin);
+if (isAdmin) {
+  showMessage("adminMessage", "Administrator verified. You can manage jobs.");
+  await loadAdminJobs();
+}
 
-    if (isAdmin) {
-      showMessage("adminMessage", "Administrator verified. You can manage jobs.");
-    }
+await loadJobs();
+await loadWallet();
 
-    await loadJobs();
-    await loadWallet();
-
-    showPage("homeDashboard");
-  }
+showPage("homeDashboard");
+}
 
   // ==========================================
   // 10. PAGE NAVIGATION
