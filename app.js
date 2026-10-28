@@ -967,40 +967,100 @@ showPage("homeDashboard");
     });
   }
 
-  const withdrawForm = $("walletWithdrawForm");
+  
+const withdrawForm = $("walletWithdrawForm");
 
-  if (withdrawForm) {
-    withdrawForm.addEventListener("submit", (event) => {
-      event.preventDefault();
+if (withdrawForm) {
+  withdrawForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-      if (!currentUser) {
-        showMessage("withdrawMessage", "Please log in first.", true);
-        return;
+    if (!currentUser) {
+      showMessage("withdrawMessage", "Please log in first.", true);
+      return;
+    }
+
+    if (!client) {
+      showMessage(
+        "withdrawMessage",
+        "Connection unavailable. Please try again later.",
+        true
+      );
+      return;
+    }
+
+    const amount = Number($("withdrawAmount")?.value);
+    const phone = ($("withdrawPhone")?.value || "").replace(/\s+/g, "");
+    const submitButton = withdrawForm.querySelector(
+      'button[type="submit"]'
+    );
+
+    if (!Number.isFinite(amount) || amount <= 0 || !Number.isInteger(amount)) {
+      showMessage(
+        "withdrawMessage",
+        "Enter a valid whole-number withdrawal amount.",
+        true
+      );
+      return;
+    }
+
+    if (!/^(07|01)[0-9]{8}$/.test(phone)) {
+      showMessage(
+        "withdrawMessage",
+        "Enter a valid Kenyan phone number starting with 07 or 01.",
+        true
+      );
+      return;
+    }
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting...";
+    }
+
+    try {
+      const { data, error } = await client.rpc(
+        "request_wallet_withdrawal",
+        {
+          p_amount: amount,
+          p_mpesa_phone: phone
+        }
+      );
+
+      if (error) {
+        throw error;
       }
 
-      const amount = Number($("withdrawAmount")?.value);
-      const phone = ($("withdrawPhone")?.value || "").replace(/\s+/g, "");
-
-      if (!Number.isFinite(amount) || amount <= 0) {
-        showMessage("withdrawMessage", "Enter a valid withdrawal amount.", true);
-        return;
-      }
-
-      if (!isValidKenyanPhone(phone)) {
-        showMessage(
-          "withdrawMessage",
-          "Enter a valid Kenyan phone number starting with 07 or 01.",
-          true
-        );
-        return;
+      if (!data || data.success !== true) {
+        throw new Error("The withdrawal request could not be confirmed.");
       }
 
       showMessage(
         "withdrawMessage",
-        "Withdrawals are not enabled yet. No money has been sent."
+        "Withdrawal request submitted successfully. Status: Pending. No M-Pesa payment has been sent."
       );
-    });
-  }
+
+      withdrawForm.reset();
+
+      if (typeof loadWallet === "function") {
+        await loadWallet(currentUser);
+      }
+    } catch (error) {
+      console.error("Withdrawal request error:", error);
+
+      showMessage(
+        "withdrawMessage",
+        error.message || "Unable to submit your request. Please try again.",
+        true
+      );
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Check withdrawal details";
+      }
+    }
+  });
+}
+
 
   // ==========================================
   // 16. STARTUP AND SESSION RESTORATION
