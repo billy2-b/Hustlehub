@@ -459,7 +459,7 @@
 
           const payButton = document.createElement("button");
           payButton.type = "button";
-          payButton.textContent = "Request KSh 70 M-Pesa Payment";
+          payButton.textContent = "Activate Account";
 
           const message = document.createElement("p");
           message.id = "activationPaymentMessage";
