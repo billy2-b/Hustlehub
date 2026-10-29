@@ -442,7 +442,7 @@
           activationPanel.append(title, status, details);
 
         } else {
-          title.textContent = "Account Not Activated";
+          title.textContent = "Account Activation";
           status.textContent = "Your account is awaiting activation.";
           details.textContent = "Enter your M-Pesa number to request a KSh 70 sandbox payment.";
 
