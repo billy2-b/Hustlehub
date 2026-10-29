@@ -403,6 +403,7 @@
     setText("signedInMessage", "Welcome to HUSTLEHUB, " + name + ".");
 
   
+  
     // ==========================================
     // ACCOUNT ACTIVATION PANEL
     // JOB SEEKERS ONLY
@@ -421,10 +422,7 @@
           const greeting = $("homeGreeting");
 
           if (greeting && greeting.parentElement) {
-            greeting.insertAdjacentElement(
-              "afterend",
-              activationPanel
-            );
+            greeting.insertAdjacentElement("afterend", activationPanel);
           } else {
             homeDashboard.prepend(activationPanel);
           }
@@ -432,65 +430,117 @@
 
         activationPanel.replaceChildren();
 
-        const activationTitle = document.createElement("h3");
-        const activationStatus = document.createElement("p");
-        const activationDetails = document.createElement("p");
+        const title = document.createElement("h3");
+        const status = document.createElement("p");
+        const details = document.createElement("p");
 
         if (currentProfile.is_activated === true) {
-          activationTitle.textContent = "Account Activated";
+          title.textContent = "Account Activated";
+          status.textContent = "Your HUSTLEHUB account is active.";
+          details.textContent = "You can continue using your account.";
 
-          activationStatus.textContent =
-            "Your HUSTLEHUB account is active.";
-
-          activationDetails.textContent =
-            "You can continue using your account.";
-
-          activationPanel.append(
-            activationTitle,
-            activationStatus,
-            activationDetails
-          );
+          activationPanel.append(title, status, details);
 
         } else {
-          activationTitle.textContent = "Account Not Activated";
+          title.textContent = "Account Not Activated";
+          status.textContent = "Your account is awaiting activation.";
+          details.textContent = "Enter your M-Pesa number to request a KSh 70 sandbox payment.";
 
-          activationStatus.textContent =
-            "Your account is currently awaiting activation.";
+          const phoneLabel = document.createElement("label");
+          phoneLabel.textContent = "M-Pesa phone number (07XXXXXXXX or 01XXXXXXXX)";
 
-          activationDetails.textContent =
-            "Account activation is not connected to payment yet. " +
-            "No payment is required through this button.";
+          const phoneInput = document.createElement("input");
+          phoneInput.type = "tel";
+          phoneInput.id = "activationPhone";
+          phoneInput.placeholder = "0712345678";
+          phoneInput.autocomplete = "tel";
+          phoneInput.inputMode = "numeric";
+          phoneInput.maxLength = 10;
 
-          const activateButton = document.createElement("button");
-          activateButton.type = "button";
-          activateButton.textContent = "Activate Account";
+          const payButton = document.createElement("button");
+          payButton.type = "button";
+          payButton.textContent = "Request KSh 70 M-Pesa Payment";
 
-          activateButton.addEventListener("click", () => {
-            activationDetails.textContent =
-              "Activation payments are not enabled yet. " +
-              "No payment has been requested. " +
-              "Please check back when activation is available.";
+          const message = document.createElement("p");
+          message.id = "activationPaymentMessage";
+          message.setAttribute("role", "status");
+
+          payButton.addEventListener("click", async () => {
+            if (!currentUser) {
+              message.textContent = "Please log in first.";
+              return;
+            }
+
+            const phone = phoneInput.value.replace(/\s+/g, "");
+
+            if (!/^(07|01)\d{8}$/.test(phone)) {
+              message.textContent = "Enter a valid Kenyan number starting with 07 or 01.";
+              return;
+            }
+
+            payButton.disabled = true;
+            payButton.textContent = "Checking payment setup...";
+            message.textContent = "Contacting the sandbox payment service.";
+
+            try {
+              const { data: sessionData, error: sessionError } =
+                await client.auth.getSession();
+
+              if (sessionError) throw sessionError;
+
+              const accessToken = sessionData.session?.access_token;
+
+              if (!accessToken) {
+                throw new Error("Your login session has expired. Please log in again.");
+              }
+
+              const { data, error } = await client.functions.invoke(
+                "mpesa-stk-push",
+                {
+                  body: { phone_number: phone }
+                }
+              );
+
+              if (error) {
+                throw error;
+              }
+
+              if (data?.error) {
+                throw new Error(data.error);
+              }
+
+              message.textContent =
+                data?.message ||
+                "Payment request submitted. Check your phone for the sandbox prompt. Your account remains inactive until payment is verified.";
+
+            } catch (error) {
+              console.error("Activation payment error:", error);
+              message.textContent =
+                error.message ||
+                "Could not submit the sandbox payment request.";
+            } finally {
+              payButton.disabled = false;
+              payButton.textContent = "Request KSh 70 M-Pesa Payment";
+            }
           });
 
           activationPanel.append(
-            activationTitle,
-            activationStatus,
-            activationDetails,
-            activateButton
+            title,
+            status,
+            details,
+            phoneLabel,
+            phoneInput,
+            payButton,
+            message
           );
         }
       }
-
     } else {
-      // Remove the activation panel from the admin dashboard.
       if (activationPanel) {
         activationPanel.remove();
       }
     }
 
-
-    
-const isAdmin = currentProfile.role === "admin";
 
 setHidden("adminSection", !isAdmin);
 
