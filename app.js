@@ -231,7 +231,7 @@
           throw new Error("Login could not be completed.");
         }
 
-        await enterMemberArea(data.user);
+        await finishEnteringMemberArea(data.user);
 
       } catch (error) {
         console.error("Login error:", error);
@@ -314,7 +314,7 @@
         if (error) throw error;
 
         if (data.session && data.user) {
-          await enterMemberArea(data.user);
+          await finishEnteringMemberArea(data.user);
         } else {
           showMessage(
             "authMessage",
