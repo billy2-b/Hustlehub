@@ -542,10 +542,16 @@
     }
 
 
+const isAdmin = currentProfile?.role === "admin";
+
 setHidden("adminSection", !isAdmin);
 
 if (isAdmin) {
-  showMessage("adminMessage", "Administrator verified. You can manage jobs.");
+  showMessage(
+    "adminMessage",
+    "Administrator verified. You can manage jobs."
+  );
+
   await loadAdminJobs();
 }
 
