@@ -255,6 +255,18 @@
   // 7. REGISTRATION FORM
   // ==========================================
 
+  // AUTO-FILL REFERRAL CODE FROM SHARED REFERRAL LINK
+  const referralParams = new URLSearchParams(window.location.search);
+  const incomingReferralCode = (
+    referralParams.get("ref") || ""
+  ).trim().toUpperCase();
+
+  const referralInput = $("signupReferralCode");
+
+  if (incomingReferralCode && referralInput) {
+    referralInput.value = incomingReferralCode;
+  }
+  
   const signupForm = $("signupForm");
 
   if (signupForm) {
