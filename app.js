@@ -608,85 +608,110 @@ showPage("homeDashboard");
   // 11. LOAD PUBLISHED JOBS
   // ==========================================
 
-  async function loadJobs() {
-    const list = $("jobsList");
+  
+async function loadJobs() {
+  const list = $("jobsList");
 
-    if (!list) return;
+  if (!list) return;
 
-    list.textContent = "Loading opportunities...";
+  list.textContent = "Loading opportunities...";
 
-    let query = client
-      .from("jobs")
-      .select("*")
-      .eq("status", "published")
-      .order("created_at", { ascending: false });
+  const { data: jobs, error } = await client.rpc("get_visible_jobs");
 
-    const { data: jobs, error } = await query;
-
-    if (error) {
-      console.error("Jobs loading error:", error);
-      list.textContent = "Unable to load jobs. Please try again later.";
-      return;
-    }
-
-    list.replaceChildren();
-
-    if (!jobs || jobs.length === 0) {
-      list.textContent = "No published opportunities available right now.";
-      return;
-    }
-
-    jobs.forEach((job) => {
-      const card = document.createElement("article");
-      card.className = "job-card";
-
-      const title = document.createElement("h3");
-      title.textContent = job.title || "Opportunity";
-
-      const company = document.createElement("p");
-      company.textContent = "Company: " + (job.company_name || "Not specified");
-
-      const details = document.createElement("p");
-      details.textContent =
-        "County: " + (job.county || "Kenya") +
-        " · Work type: " + (job.work_type || "Not specified");
-
-      const category = document.createElement("p");
-      category.textContent = "Category: " + (job.category || "General");
-
-      const description = document.createElement("p");
-      description.textContent = job.description || "";
-
-      card.append(title, company, details, category, description);
-
-      if (job.verified) {
-        const verified = document.createElement("p");
-        verified.textContent = "✓ Verified listing";
-        card.appendChild(verified);
-      }
-
-      if (job.application_url) {
-        try {
-          const url = new URL(job.application_url);
-
-          if (url.protocol === "https:" || url.protocol === "http:") {
-            const link = document.createElement("a");
-            link.href = url.href;
-            link.textContent = "View application";
-            link.target = "_blank";
-            link.rel = "noopener noreferrer";
-            card.appendChild(link);
-          }
-        } catch {
-          // Do not create a link if the URL is invalid.
-        }
-      }
-
-      list.appendChild(card);
-    });
-
-    showMessage("jobsMessage", jobs.length + " published opportunity/opportunities loaded.");
+  if (error) {
+    console.error("Jobs loading error:", error);
+    list.textContent = "Unable to load jobs. Please try again later.";
+    return;
   }
+
+  list.replaceChildren();
+
+  if (!jobs || jobs.length === 0) {
+    list.textContent = "No published opportunities available right now.";
+    return;
+  }
+
+  jobs.forEach((job) => {
+    const card = document.createElement("article");
+    card.className = "job-card";
+
+    // Completely locked premium job
+    if (job.access_type === "premium" && !job.title) {
+      const heading = document.createElement("h3");
+      heading.textContent = "🔒 Premium Job";
+
+      const price = document.createElement("p");
+      price.textContent =
+        "Unlock price: KSh " +
+        Number(job.unlock_price_kes).toLocaleString("en-KE");
+
+      const notice = document.createElement("p");
+      notice.textContent =
+        "This opportunity is locked. Unlock access will be available after payment integration is completed.";
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.disabled = true;
+      button.textContent = "Unlock feature coming soon";
+
+      card.append(heading, price, notice, button);
+      list.appendChild(card);
+      return;
+    }
+
+    // Free or successfully unlocked job
+    const title = document.createElement("h3");
+    title.textContent = job.title || "Opportunity";
+
+    const company = document.createElement("p");
+    company.textContent =
+      "Company: " + (job.company_name || "Not specified");
+
+    const details = document.createElement("p");
+    details.textContent =
+      "County: " + (job.county || "Kenya") +
+      " · Work type: " + (job.work_type || "Not specified");
+
+    const category = document.createElement("p");
+    category.textContent = "Category: " + (job.category || "General");
+
+    const description = document.createElement("p");
+    description.textContent = job.description || "";
+
+    card.append(title, company, details, category, description);
+
+    if (job.verified) {
+      const verified = document.createElement("p");
+      verified.textContent = "✓ Verified listing";
+      card.appendChild(verified);
+    }
+
+    if (job.application_url) {
+      try {
+        const url = new URL(job.application_url);
+
+        if (url.protocol === "https:" || url.protocol === "http:") {
+          const link = document.createElement("a");
+          link.href = url.href;
+          link.textContent = "View application";
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          card.appendChild(link);
+        }
+      } catch {
+        // Ignore invalid application URLs.
+      }
+    }
+
+    list.appendChild(card);
+  });
+
+  showMessage(
+    "jobsMessage",
+    jobs.length + " published opportunity/opportunities loaded."
+  );
+            }
+  
 
   // ==========================================
   // 12. ADMIN JOB CREATION
