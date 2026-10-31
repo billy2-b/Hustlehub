@@ -1047,12 +1047,18 @@ const rewards = (rewardRows || [])
 
       showMessage("walletMessage", "Wallet information loaded.");
 
-    } catch (error) {
+        } catch (error) {
       console.error("Wallet loading error:", error);
+
+      const errorMessage =
+        error?.message ||
+        error?.details ||
+        error?.hint ||
+        "Unknown wallet error";
 
       showMessage(
         "walletMessage",
-        "Wallet information could not be loaded. Check your wallet table columns and permissions.",
+        "Wallet error: " + errorMessage,
         true
       );
     }
