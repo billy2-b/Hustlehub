@@ -811,7 +811,7 @@ if (adminJobAccess) {
 
         showMessage("adminJobsMessage", "Opportunity saved successfully.");
         adminJobForm.reset();
-
+updatePremiumPriceVisibility();
         await loadJobs();
         await loadAdminJobs();
 
