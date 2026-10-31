@@ -979,8 +979,10 @@ const { data: rewardRows, error: rewardError } = await client
   .eq("referrer_id", currentUser.id)
   .eq("status", "credited");
 
-if (rewardError) throw rewardError;
-
+if (rewardError) {
+  console.error("Referral rewards error:", rewardError);
+  throw rewardError;
+}
 const rewards = (rewardRows || [])
   .reduce((sum, item) => sum + Number(item.amount_kes || 0), 0);
       const pending = rows
