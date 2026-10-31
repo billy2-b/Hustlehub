@@ -962,6 +962,64 @@ updatePremiumPriceVisibility();
         0;
 
       setText("walletBalance", formatKES(balance));
+      
+      // LOAD MY REFERRAL CODE AND GENERATE MY REFERRAL LINK
+      const { data: myProfile, error: profileError } = await client
+        .from("profiles")
+        .select("referral_code")
+        .eq("id", currentUser.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      const referralCode = myProfile?.referral_code || "";
+
+      setText(
+        "myReferralCode",
+        referralCode || "Referral code unavailable"
+      );
+
+      const referralLink = referralCode
+        ? "https://billy2-b.github.io/Hustlehub/?ref=" +
+          encodeURIComponent(referralCode) +
+          "#signupForm"
+        : "";
+
+      const linkInput = $("myReferralLink");
+
+      if (linkInput) {
+        linkInput.value = referralLink;
+      }
+
+      const copyCodeButton = $("copyReferralCode");
+      const copyLinkButton = $("copyReferralLink");
+
+      if (copyCodeButton) {
+        copyCodeButton.disabled = !referralCode;
+
+        copyCodeButton.onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(referralCode);
+            showMessage("referralMessage", "Referral code copied!");
+          } catch (error) {
+            showMessage("referralMessage", "Could not copy. Please copy the code manually.", true);
+          }
+        };
+      }
+
+      if (copyLinkButton) {
+        copyLinkButton.disabled = !referralLink;
+
+        copyLinkButton.onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(referralLink);
+            showMessage("referralMessage", "Referral link copied!");
+          } catch (error) {
+            showMessage("referralMessage", "Could not copy. Please copy the link manually.", true);
+          }
+        };
+      }
+      
 
       const { data: transactions, error: transactionError } = await client
         .from("wallet_transactions")
