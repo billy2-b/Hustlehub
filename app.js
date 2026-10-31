@@ -1161,6 +1161,36 @@ if (withdrawForm) {
       "HUSTLEHUB could not start. Refresh the page and try again.",
       true
     );
+  // LEGAL DOCUMENT VISIBILITY
+const privacyPolicy = document.getElementById("privacyPolicy");
+const termsConditions = document.getElementById("termsConditions");
+
+function hideLegalDocuments() {
+  if (privacyPolicy) privacyPolicy.hidden = true;
+  if (termsConditions) termsConditions.hidden = true;
+}
+
+hideLegalDocuments();
+
+document.querySelectorAll(
+  'a[href="#privacyPolicy"], a[href="#termsConditions"]'
+).forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+
+    hideLegalDocuments();
+
+    if (link.getAttribute("href") === "#privacyPolicy" && privacyPolicy) {
+      privacyPolicy.hidden = false;
+      privacyPolicy.scrollIntoView({ behavior: "smooth" });
+    }
+
+    if (link.getAttribute("href") === "#termsConditions" && termsConditions) {
+      termsConditions.hidden = false;
+      termsConditions.scrollIntoView({ behavior: "smooth" });
+    }
+  });
+});
   });
 
   // ==========================================
