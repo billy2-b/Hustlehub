@@ -973,14 +973,16 @@ updatePremiumPriceVisibility();
       if (transactionError) throw transactionError;
 
       const rows = transactions || [];
+const { data: rewardRows, error: rewardError } = await client
+  .from("referral_rewards")
+  .select("amount_kes")
+  .eq("referrer_id", currentUser.id)
+  .eq("status", "credited");
 
-      const rewards = rows
-        .filter((item) =>
-          item.transaction_type === "referral_reward" &&
-          item.status === "completed"
-        )
-        .reduce((sum, item) => sum + Number(item.amount_kes || 0), 0);
+if (rewardError) throw rewardError;
 
+const rewards = (rewardRows || [])
+  .reduce((sum, item) => sum + Number(item.amount_kes || 0), 0);
       const pending = rows
         .filter((item) => item.status === "pending")
         .reduce((sum, item) => sum + Number(item.amount_kes || 0), 0);
