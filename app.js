@@ -736,7 +736,24 @@ async function loadJobs() {
         return;
       }
 
-      const status = $("adminJobStatus")?.value || "draft";
+            const status = $("adminJobStatus")?.value || "draft";
+      const accessType = $("adminJobAccess")?.value || "free";
+
+      const unlockPrice = Number(
+        $("adminUnlockPrice")?.value
+      );
+
+      if (
+        accessType === "premium" &&
+        (!Number.isSafeInteger(unlockPrice) || unlockPrice <= 0)
+      ) {
+        showMessage(
+          "adminJobsMessage",
+          "Please enter a valid Premium unlock price in KSh.",
+          true
+        );
+        return;
+      }
 
       const newJob = {
         title,
@@ -746,6 +763,9 @@ async function loadJobs() {
         category: $("adminCategory")?.value || "General",
         description: $("adminDescription")?.value.trim() || "",
         application_url: $("adminApplicationUrl")?.value.trim() || null,
+        access_type: accessType,
+        unlock_price_kes:
+          accessType === "premium" ? unlockPrice : null,
         status: status === "published" ? "published" : "draft",
         verified: false
       };
