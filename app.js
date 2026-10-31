@@ -983,6 +983,7 @@ if (rewardError) {
   console.error("Referral rewards error:", rewardError);
   throw rewardError;
 }
+      console.log("Referral rewards loaded:", rewardRows);
 const rewards = (rewardRows || [])
   .reduce((sum, item) => sum + Number(item.amount_kes || 0), 0);
       const pending = rows
