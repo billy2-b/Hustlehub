@@ -741,6 +741,30 @@
                   placeholder="https://example.com/apply"
                 >
               </div>
+                            <!-- JOB ACCESS TYPE -->
+              <div class="form-group">
+                <label for="adminJobAccess">Job access type</label>
+                <select id="adminJobAccess" name="access_type">
+                  <option value="free">Free job</option>
+                  <option value="premium">Premium (locked)</option>
+                </select>
+              </div>
+
+              <!-- PREMIUM UNLOCK PRICE -->
+              <div class="form-group" id="premiumPriceGroup" hidden>
+                <label for="adminUnlockPrice">Unlock price (KSh)</label>
+                <input
+                  id="adminUnlockPrice"
+                  name="unlock_price_kes"
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="Enter your chosen amount"
+                >
+                <small>
+                  Job seekers must unlock this job to see its details.
+                </small>
+              </div>
 
               <div class="form-group">
                 <label for="adminJobStatus">Initial status</label>
@@ -768,7 +792,7 @@
               <h3>Manage existing jobs</h3>
               <button
                 id="refreshAdminJobs"
-                class="btn btn-secondary btn-small"
+                class="btn btn-secondary nbtn-small"
                 type="button"
               >
                 Refresh list
