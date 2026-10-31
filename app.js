@@ -651,8 +651,8 @@ async function loadJobs() {
 
       const button = document.createElement("button");
       button.type = "button";
-      button.disabled = true;
-      button.textContent = "Unlock feature coming soon";
+      button.disabled = false;
+      button.textContent = "Unlock";
 
       card.append(heading, price, notice, button);
       list.appendChild(card);
