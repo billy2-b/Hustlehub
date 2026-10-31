@@ -718,6 +718,30 @@ async function loadJobs() {
   // ==========================================
 
   const adminJobForm = $("adminJobForm");
+  const adminJobAccess = $("adminJobAccess");
+const premiumPriceGroup = $("premiumPriceGroup");
+const adminUnlockPrice = $("adminUnlockPrice");
+
+function updatePremiumPriceVisibility() {
+  const isPremium = adminJobAccess?.value === "premium";
+
+  if (premiumPriceGroup) {
+    premiumPriceGroup.hidden = !isPremium;
+  }
+
+  if (adminUnlockPrice) {
+    adminUnlockPrice.required = isPremium;
+  }
+}
+
+if (adminJobAccess) {
+  adminJobAccess.addEventListener(
+    "change",
+    updatePremiumPriceVisibility
+  );
+
+  updatePremiumPriceVisibility();
+}
 
   if (adminJobForm) {
     adminJobForm.addEventListener("submit", async (event) => {
