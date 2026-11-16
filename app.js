@@ -115,6 +115,7 @@
     SUPABASE_PUBLISHABLE_KEY
   );
 window.hustlehubClient = client;
+console.log("HUSTLEHUB CLIENT EXPOSED:", !!window.hustlehubClient);
   // Shared account information used by Part 2.
   let currentUser = null;
   let currentProfile = null;
