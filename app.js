@@ -114,7 +114,7 @@
     SUPABASE_URL,
     SUPABASE_PUBLISHABLE_KEY
   );
-
+window.hustlehubClient = client;
   // Shared account information used by Part 2.
   let currentUser = null;
   let currentProfile = null;
