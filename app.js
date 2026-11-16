@@ -457,7 +457,7 @@ console.log("HUSTLEHUB CLIENT EXPOSED:", !!window.hustlehubClient);
         } else {
           title.textContent = "Account Activation";
           status.textContent = "Your account is awaiting activation.";
-          details.textContent = "Enter your M-Pesa number to request a KSh 70 sandbox payment.";
+          details.textContent = "Enter your M-Pesa number to request a KSh 99 activation payment.";
 
           const phoneLabel = document.createElement("label");
           phoneLabel.textContent = "M-Pesa phone number (07XXXXXXXX or 01XXXXXXXX)";
@@ -493,7 +493,7 @@ console.log("HUSTLEHUB CLIENT EXPOSED:", !!window.hustlehubClient);
 
             payButton.disabled = true;
             payButton.textContent = "Checking payment setup...";
-            message.textContent = "Contacting the sandbox payment service.";
+            message.textContent = "Contacting the M-Pesa payment service.";
 
             try {
               const { data: sessionData, error: sessionError } =
@@ -530,10 +530,10 @@ console.log("HUSTLEHUB CLIENT EXPOSED:", !!window.hustlehubClient);
               console.error("Activation payment error:", error);
               message.textContent =
                 error.message ||
-                "Could not submit the sandbox payment request.";
+                "Could not submit the M-Pesa payment request.";
             } finally {
               payButton.disabled = false;
-              payButton.textContent = "Request KSh 70 M-Pesa Payment";
+              payButton.textContent = "Request KSh 99 M-Pesa Payment";
             }
           });
 
