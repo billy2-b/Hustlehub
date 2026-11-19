@@ -523,9 +523,8 @@ console.log("HUSTLEHUB CLIENT EXPOSED:", !!window.hustlehubClient);
               }
 
               message.textContent =
-                data?.message ||
-                "Payment request submitted. Check your phone for the sandbox prompt. Your account remains inactive until payment is verified.";
-
+  data?.message ||
+  "Payment request submitted. Check your phone for the M-Pesa prompt. Your account remains inactive until payment is verified.";
             } catch (error) {
               console.error("Activation payment error:", error);
               message.textContent =
